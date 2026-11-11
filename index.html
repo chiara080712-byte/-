@@ -1,3089 +1,437 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>학습지 완벽대비 세계사 스마트 마스터</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>세계사 핵심 요약본</title>
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --correct: #10b981;
+      --wrong: #ef4444;
+      --accent: #f59e0b;
     }
-    body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-      word-break: keep-all;
-      overflow-wrap: break-word;
-      line-height: 1.7;
-    }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .touch-target { min-height: 48px; }
-    
-    /* 인포그래픽 가로 스크롤바 커스텀 */
-    .infographic-scroll::-webkit-scrollbar {
-      height: 6px;
-    }
-    .infographic-scroll::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 9999px;
-    }
-    .infographic-scroll::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
-    .infographic-scroll::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; line-height: 1.6; }
+    header { background: #ffffff; border-bottom: 1px solid var(--border); padding: 16px 20px; position: sticky; top: 0; z-index: 50; }
+    .header-inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); }
+    .nav-tabs { display: flex; gap: 8px; max-width: 900px; margin: 16px auto; padding: 0 16px; overflow-x: auto; }
+    .tab-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--text-muted); }
+    .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    main { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+    .unit-selector { margin-bottom: 20px; }
+    select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 1rem; background: #fff; color: var(--text); font-weight: 600; }
+    .card { background: var(--card-bg); border-radius: 12px; padding: 24px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+    .summary-text { font-size: 0.95rem; line-height: 1.8; color: var(--text); }
+    .summary-text b { color: #0f172a; }
+    .summary-text ul { padding-left: 20px; margin: 10px 0; }
+    .summary-text li { margin-bottom: 6px; }
+
+    /* 타임라인 가로 와이드 인포그래픽 */
+    .timeline-container { position: relative; margin-top: 24px; padding: 16px; background: #f1f5f9; border-radius: 8px; }
+    .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .timeline-header span { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .timeline-nav-btns button { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-weight: bold; }
+    .timeline-rail { display: flex; overflow-x: auto; scroll-behavior: smooth; padding: 20px 10px; gap: 24px; position: relative; }
+    .timeline-rail::-webkit-scrollbar { height: 6px; }
+    .timeline-rail::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .timeline-bar-bg { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--primary); transform: translateY(-50%); z-index: 1; }
+    .timeline-node { position: relative; z-index: 2; flex: 0 0 260px; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .timeline-node .year { font-weight: 800; font-size: 0.85rem; color: var(--primary); margin-bottom: 4px; display: inline-block; }
+    .timeline-node .title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; color: #0f172a; }
+    .timeline-node .desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* 퀴즈 UI */
+    .quiz-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .quiz-card.correct { border-color: var(--correct); background: #f0fdf4; }
+    .quiz-card.wrong { border-color: var(--wrong); background: #fef2f2; }
+    .quiz-meta { display: flex; gap: 8px; margin-bottom: 8px; }
+    .badge { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+    .badge-primary { background: #e0f2fe; color: #0369a1; }
+    .badge-accent { background: #fef3c7; color: #b45309; }
+    .quiz-q { font-weight: 700; font-size: 1rem; margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .opt-btn { text-align: left; padding: 10px 14px; border: 1px solid var(--border); background: #fff; border-radius: 6px; font-size: 0.9rem; cursor: pointer; transition: 0.1s; }
+    .opt-btn:hover { background: #f8fafc; }
+    .opt-btn.selected-correct { background: #dcfce7 !important; border-color: var(--correct) !important; color: #166534 !important; font-weight: 700; }
+    .opt-btn.selected-wrong { background: #fee2e2 !important; border-color: var(--wrong) !important; color: #991b1b !important; }
+    .explanation { margin-top: 12px; font-size: 0.85rem; padding: 10px; border-radius: 6px; background: #fff; border: 1px dashed var(--border); display: none; }
+
+    /* 빈칸 채우기 UI */
+    .blank-row { margin-bottom: 12px; line-height: 2.2; }
+    .blank-input { border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px; font-size: 0.95rem; width: 130px; text-align: center; font-weight: 600; outline: none; }
+    .blank-input.is-correct { border-color: var(--correct); background: #f0fdf4; color: #166534; }
+    .blank-input.is-wrong { border-color: var(--wrong); background: #fef2f2; color: #991b1b; }
+    .btn-check-blank { padding: 6px 12px; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-left: 6px; }
+
+    /* 서술형 트레이닝 */
+    .desc-box { margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); }
+    .desc-prompt { font-weight: 700; margin-bottom: 8px; }
+    .desc-area { width: 100%; height: 75px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; resize: vertical; }
+    .desc-check-btn { margin-top: 8px; padding: 6px 14px; background: #475569; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .desc-feedback { margin-top: 12px; display: none; font-size: 0.85rem; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+<body>
 
-  <!-- 상단 네비게이션 헤더 -->
-  <header class="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-xs">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <span class="w-9 h-9 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center text-base shadow-sm">
-          史
-        </span>
-        <div>
-          <h1 class="text-base font-black text-slate-900 leading-tight">세계사 핵심 요약본</h1>
-          <p class="text-xs text-blue-600 font-bold">학습지 손글씨·빈칸 100% 원문 일치</p>
-        </div>
-      </div>
-      <span id="current-badge" class="px-3 py-1 text-xs font-black rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-        핵심 요약
-      </span>
-    </div>
-
-    <!-- 모드 선택 탭 -->
-    <div class="max-w-3xl mx-auto px-4 pb-3">
-      <div class="grid grid-cols-5 p-1 bg-slate-100 rounded-2xl gap-1 text-xs font-bold">
-        <button id="tab-summary" onclick="changeMode('summary')" class="py-2.5 rounded-xl bg-white text-blue-700 shadow-sm text-center touch-target flex items-center justify-center">
-          📖 요약
-        </button>
-        <button id="tab-fillin" onclick="changeMode('fillin')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-center touch-target flex items-center justify-center">
-          💡 빈칸
-        </button>
-        <button id="tab-basic" onclick="changeMode('basic')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-center touch-target flex items-center justify-center">
-          ✏️ 기본
-        </button>
-        <button id="tab-advanced" onclick="changeMode('advanced')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-center touch-target flex items-center justify-center">
-          🔍 심화
-        </button>
-        <button id="tab-essay" onclick="changeMode('essay')" class="py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-center touch-target flex items-center justify-center">
-          ✍️ 서술
-        </button>
-      </div>
+  <header>
+    <div class="header-inner">
+      <h1>세계사 핵심 요약본</h1>
+      <span style="font-size:0.8rem; color:var(--text-muted);">전 단원 6문항 탑재</span>
     </div>
   </header>
 
-  <!-- 메인 컨텐츠 영역 -->
-  <main class="flex-grow max-w-3xl w-full mx-auto px-4 py-4 space-y-4">
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('summary')">📖 핵심 요약 & 타임라인</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">📝 객관식 6제 (기본/심화)</button>
+    <button class="tab-btn" onclick="switchTab('blank')">✏️ 빈칸 채우기</button>
+    <button class="tab-btn" onclick="switchTab('essay')">✍️ 서술형 트레이닝</button>
+  </div>
 
-    <!-- 차시 선택 캐러셀 -->
-    <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-      <div class="flex items-center justify-between mb-2.5">
-        <span class="text-xs font-black text-slate-500">📌 공부할 차시 선택</span>
-        <div class="flex items-center gap-2">
-          <!-- 모바일/PC 모두 편하게 바로 선택 가능한 드롭다운 메뉴 추가 -->
-          <select id="chasi-dropdown-select" onchange="onSelectChasiDropdown(this.value)" class="text-xs font-bold bg-slate-100 text-slate-800 rounded-lg px-2 py-1 border border-slate-200 focus:outline-none focus:border-blue-600">
-          </select>
-          <span class="text-xs text-blue-700 font-extrabold hidden sm:inline-block" id="filter-status-text">전체 단원 보기</span>
-        </div>
-      </div>
-      <!-- 좌우 넘김 버튼과 가로 스크롤 영역 -->
-      <div class="relative flex items-center">
-        <!-- 왼쪽 스크롤 버튼 -->
-        <button onclick="scrollChasiList(-180)" class="touch-target w-8 h-9 flex-shrink-0 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg flex items-center justify-center text-slate-700 font-black text-sm mr-1.5 transition" aria-label="이전 차시">
-          ◀
-        </button>
-        <!-- 차시 버튼 목록 -->
-        <div class="flex gap-2 overflow-x-auto no-scrollbar py-1 scroll-smooth flex-grow" id="chasi-pill-list"></div>
-        <!-- 오른쪽 스크롤 버튼 -->
-        <button onclick="scrollChasiList(180)" class="touch-target w-8 h-9 flex-shrink-0 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg flex items-center justify-center text-slate-700 font-black text-sm ml-1.5 transition" aria-label="다음 차시">
-          ▶
-        </button>
-      </div>
+  <main>
+    <div class="unit-selector">
+      <select id="unitSelect" onchange="renderCurrentUnit()">
+        <option value="0">34-35차시: 게르만족 이동과 프랑크 왕국</option>
+        <option value="1">36-37차시: 봉건제의 성립과 크리스트교 발전</option>
+        <option value="2">38-39차시: 비잔티움 제국과 중세 유럽의 변화</option>
+        <option value="3">40-41차시: 십자군 전쟁과 중세 도시 발전</option>
+        <option value="4">42-43차시: 르네상스와 종교 개혁</option>
+        <option value="5">44-45차시: 신항로 개척과 절대왕정 (서유럽)</option>
+        <option value="6">46-47차시: 동유럽 절대왕정과 17~18세기 과학 혁명</option>
+        <option value="7">48-49차시: 영국 혁명 (청교도/명예혁명)</option>
+        <option value="8">50-51차시: 미국 독립 혁명과 산업 혁명</option>
+        <option value="9">52-53차시: 프랑스 혁명 (국민의회~공포정치)</option>
+        <option value="10">54-55차시: 나폴레옹 시대와 빈 체제</option>
+        <option value="11">56-57차시: 7월 혁명과 2월 혁명</option>
+        <option value="12">58-59차시: 영국의 자유주의 개혁과 이탈리아·독일의 통일</option>
+        <option value="13">60-61차시: 러시아의 발전과 미국의 발전 (남북 전쟁)</option>
+      </select>
     </div>
 
-    <!-- 1. 핵심 요약 보기 -->
-    <section id="view-summary" class="space-y-4"></section>
-
-    <!-- 2. 개념 확인 (빈칸 타이핑) 섹션 -->
-    <section id="view-fillin" class="hidden space-y-4">
-      <div class="bg-blue-50 rounded-2xl p-4 border-2 border-blue-200 text-slate-800">
-        <div class="flex items-center justify-between gap-2">
-          <div>
-            <p class="font-black text-sm text-blue-900">💡 학습지 빈칸 단어 직접 타이핑하기</p>
-            <p class="text-xs text-blue-800 mt-0.5">학습지 괄호에 적힌 <strong>손글씨 정답 그대로</strong> 입력하세요. (초성 힌트 제공, 띄어쓰기 무관)</p>
-          </div>
-          <button onclick="resetAllFillins()" class="touch-target px-3 py-1.5 bg-white border border-blue-300 text-blue-700 hover:bg-blue-100 font-black rounded-xl text-xs whitespace-nowrap shadow-xs">
-            다시 쓰기 ↺
-          </button>
-        </div>
-      </div>
-      <div id="fillin-cards-list" class="space-y-3.5"></div>
-    </section>
-
-    <!-- 3. 객관식 퀴즈 (기본 & 심화 공통) -->
-    <section id="view-quiz" class="hidden space-y-4">
-      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between">
-        <div>
-          <span id="quiz-badge" class="px-2.5 py-1 rounded-lg text-xs font-black bg-blue-50 text-blue-700 border border-blue-100">기본 5지선다</span>
-          <span id="quiz-count-info" class="text-xs text-slate-500 font-bold ml-2">총 5문항</span>
-        </div>
-        <button onclick="reloadQuizSet()" class="touch-target px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-black flex items-center gap-1.5 transition">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          새 문제로 섞기
-        </button>
-      </div>
-
-      <div id="quiz-card" class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span id="q-number" class="text-xs font-black px-2.5 py-1 bg-slate-900 text-white rounded-lg">Q1</span>
-            <span id="q-chasi" class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">34~35차시</span>
-          </div>
-          <span id="q-step" class="text-xs font-black text-slate-400">1 / 5</span>
-        </div>
-
-        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-5">
-          <div id="q-bar" class="bg-blue-600 h-full rounded-full transition-all duration-300" style="width: 20%;"></div>
-        </div>
-
-        <h3 id="q-text" class="text-base sm:text-lg font-black text-slate-900 leading-snug mb-4"></h3>
-        <div id="q-box-material" class="hidden mb-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed font-mono"></div>
-        <div id="q-options-container" class="space-y-2.5"></div>
-        <div id="q-feedback" class="hidden mt-5 p-4 rounded-xl text-xs sm:text-sm leading-relaxed border"></div>
-
-        <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-          <button id="q-prev-btn" onclick="moveQuiz(-1)" class="touch-target px-4 py-2 text-xs font-black text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:pointer-events-none">
-            ← 이전 문항
-          </button>
-          <button id="q-next-btn" onclick="moveQuiz(1)" class="touch-target px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm rounded-xl transition shadow-xs">
-            다음 문항 →
-          </button>
-        </div>
-      </div>
-
-      <div id="quiz-result-card" class="hidden bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm text-center">
-        <div class="text-4xl mb-3">💯</div>
-        <h3 class="text-lg font-black text-slate-900">문제 풀이를 완료했습니다!</h3>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1">학습지 핵심 용어를 복습하며 다시 풀어보세요.</p>
-        <div class="my-5 p-5 rounded-2xl bg-blue-50 max-w-xs mx-auto border border-blue-100">
-          <span class="text-xs text-slate-600 font-bold block">맞힌 개수</span>
-          <span class="text-4xl font-black text-blue-600 mt-1 inline-block">
-            <span id="final-correct">0</span> <span class="text-slate-400 text-lg font-normal">/</span> <span id="final-total" class="text-slate-800 text-xl">5</span>
-          </span>
-        </div>
-        <button onclick="reloadQuizSet()" class="touch-target px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition">
-          새 문제 세트로 다시 풀기 🔄
-        </button>
-      </div>
-    </section>
-
-    <!-- 4. 서술형 문항 연습 -->
-    <section id="view-essay" class="hidden space-y-4">
-      <div class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-200 text-slate-800">
-        <p class="font-black text-sm text-amber-950">📝 서술형 실전 트레이닝</p>
-        <p class="text-xs text-amber-900 mt-0.5">학습지 본문 문장 그대로 작성해보고 <strong>[채점 및 모범 답안]</strong>을 눌러 필수 키워드와 채점 기준을 점검하세요.</p>
-      </div>
-      <div id="essay-cards-list" class="space-y-4"></div>
-    </section>
-
+    <div id="contentArea"></div>
   </main>
 
-  <footer class="mt-auto border-t border-slate-200 bg-white py-4 text-center text-xs font-semibold text-slate-400">
-    교과서 세계사 학습지 수록 용어 완벽 일치 • 스마트 스터디
-  </footer>
-
   <script>
-    /* ========================================================
-       1. 학습지 차시 목록
-       ======================================================== */
-    const CHASI_DATA = [
-      { id: "all", label: "전체" },
-      { id: "34-35", label: "34~35차시" },
-      { id: "36-37", label: "36~37차시" },
-      { id: "38", label: "38차시" },
-      { id: "39", label: "39차시" },
-      { id: "40", label: "40차시" },
-      { id: "41", label: "41차시" },
-      { id: "42-43", label: "42~43차시" },
-      { id: "44-45", label: "44~45차시" },
-      { id: "46-47", label: "46~47차시" },
-      { id: "49", label: "49차시" },
-      { id: "50-51", label: "50~51차시" },
-      { id: "52-53", label: "52~53차시" },
-      { id: "54-55", label: "54~55차시" },
-      { id: "56-57", label: "56~57차시" },
-      { id: "58-59", label: "58~59차시" },
-      { id: "60-61", label: "60~61차시" },
-      { id: "62", label: "62차시" }
-    ];
-
-    /* ========================================================
-       2. 학습지 본문 단어 그대로 정리한 요약 데이터
-       ======================================================== */
-    const SUMMARY_DATA = [
+    const database = [
       {
-        id: "34-35",
-        badge: "34~35차시 (교과서 86~88쪽)",
-        title: "⑤ 유럽 세계에서 변화가 일어나다",
+        unit: "34-35차시: 게르만족 이동과 프랑크 왕국",
+        summary: `
+          <ul>
+            <li><b>게르만족의 이동:</b> 훈족의 압박으로 게르만족이 이동하며 서로마 제국 영내에 여러 왕국을 건설하였고, 결국 서로마 제국이 멸망(476)하였습니다.</li>
+            <li><b>프랑크 왕국의 번영:</b> 이동 거리가 짧아 로마의 유산을 쉽게 수용하였고, <b>클로비스</b>가 로마 가톨릭으로 개종하여 로마 원주민 및 교회와의 마찰을 줄였습니다.</li>
+            <li><b>카롤루스 마그누스:</b> 영토를 대폭 확장하여 서유럽 대부분을 통일하고, 교황 레오 3세로부터 <b>서로마 황제의 관</b>을 대관받았습니다. 로마 문화, 크리스트교, 게르만 문화를 융합하여 서유럽 문화권의 기틀을 확립하였습니다.</li>
+            <li><b>프랑크 왕국의 분열:</b> 베르됭 조약(843)과 메르센 조약(870)을 거치며 서프랑크(프랑스), 동프랑크(독일), 중프랑크(이탈리아)로 분열되었습니다.</li>
+          </ul>
+        `,
         timeline: [
-          { time: "4세기 말", title: "게르만족 이동", desc: "훈족 압박으로 대규모 이동 (476 서로마 멸망)", color: "blue", icon: "⚔️" },
-          { time: "5세기 말", title: "프랑크 왕국 개종", desc: "크리스트교 수용으로 로마 교회 지지 획득", color: "teal", icon: "⛪" },
-          { time: "8세기 초", title: "이슬람 세력 격퇴", desc: "서유럽에 쳐들어온 이슬람 세력 저지", color: "amber", icon: "🛡️" },
-          { time: "800년", title: "카롤루스 대제 대관", desc: "서로마 황제 관 받음 (서유럽 문화 기틀)", color: "rose", icon: "👑" },
-          { time: "9세기", title: "프랑크 왕국 분열", desc: "베르됭·메르센 조약으로 서·중·동프랑크 분열", color: "indigo", icon: "📜" }
+          { year: "375년", title: "게르만족의 대이동", desc: "훈족의 이동에 압박받아 서로마 제국 영내로 대규모 이동 시작" },
+          { year: "476년", title: "서로마 제국 멸망", desc: "용병대장 오도아케르에 의해 서로마 황제 폐위" },
+          { year: "496년", title: "클로비스의 가톨릭 개종", desc: "로마 가톨릭(아타나시우스파)으로 개종하여 교회의 지지 확보" },
+          { year: "800년", title: "카롤루스 마그누스 대관", desc: "교황 레오 3세에게 서로마 황제의 관을 받아 서유럽 문화권 기틀 마련" },
+          { year: "843/870년", title: "베르됭·메르센 조약", desc: "프랑크 왕국이 서·동·중 프랑크 3국으로 분열" }
         ],
-        sections: [
+        quizzes: [
           {
-            title: "1. 게르만족의 이동과 프랑크 왕국의 성장",
-            items: [
-              "<strong>게르만족의 이동:</strong> 4세기 말 훈족의 압박을 받아 대규모 이동 → 서로마 제국 곳곳에 나라 건국 → 게르만족 출신 용병 대장에게 <strong>서로마 제국 멸망(476)</strong>.",
-              "<strong>프랑크 왕국의 성장:</strong> 게르만족이 갈리아 지방에 세운 나라로 오랫동안 번성함. 5세기 말 크리스트교를 받아들여 로마 교회의 지지를 얻음. 8세기 초 서유럽에 쳐들어온 이슬람 세력을 막아냄.",
-              "<strong>프랑크 왕국의 전성기 (카롤루스 대제):</strong> 영토 확장, 정복한 지역에 크리스트교 전파. <strong>로마 교황(레오 3세)으로부터 서로마 황제의 관을 받음(800)</strong>. 곳곳에 학교를 세워 학문과 예술의 발전을 이끎 → 게르만 문화, 로마 문화, 크리스트교가 어우러진 서유럽 문화의 기틀 마련.",
-              "<strong>프랑크 왕국의 분열:</strong> 카롤루스 대제 사후 내분 발생 → <strong>베르됭 조약, 메르센 조약</strong> 체결 → 서프랑크, 중프랑크, 동프랑크로 분열."
-            ]
+            type: "기본",
+            q: "게르만족이 서로마 제국 영내로 대이동을 시작하게 된 직접적인 계기는 무엇인가요?",
+            options: ["훈족의 압박", "노르만족의 침입", "이슬람 세력의 팽창", "몽골 제국의 침략", "비잔티움 제국의 공격"],
+            ans: 0,
+            exp: "4세기 후반 아시아계 훈족의 서진에 압박을 받아 게르만족이 대이동을 시작했습니다."
           },
           {
-            title: "2. 비잔티움 제국의 발전과 문화",
-            items: [
-              "<strong>발전:</strong> 서로마 제국 멸망 뒤에도 약 천 년 동안 더 지속됨. 황제가 정치적·군사적 지배자이자 교회의 수장 역할을 함.",
-              "<strong>전성기 (6세기 유스티니아누스 시기):</strong> 옛 로마 제국 영토의 상당 부분 회복, <strong>『유스티니아누스 법전』</strong> 편찬, <strong>성 소피아 대성당(아야 소피아)</strong> 건립. 수도 <strong>콘스탄티노폴리스</strong>의 번영(유럽과 아시아를 잇는 교역로에 위치, 세계 최대 도시로 성장).",
-              "<strong>동·서로마 교회의 분리:</strong> 8세기에 황제가 성상 숭배 금지 → 크리스트교 세력이 동서로 나뉘어 대립 → 로마 가톨릭교회와 <strong>그리스 정교</strong>로 분리.",
-              "<strong>문화적 특징:</strong> 그리스 정교를 바탕으로 고대 그리스·로마 문화와 <strong>헬레니즘 문화</strong>가 융합 → 독자적인 문화로 발전시킴. 그리스어를 공용어로 사용(그리스 고전 연구 및 보존 → 이탈리아 르네상스에 크게 기여). 로마의 법률 집대성. 거대한 돔과 내부의 <strong>모자이크 벽화</strong>가 특징인 비잔티움 양식 발달. 슬라브인의 역사와 문화에 영향을 줌."
-            ]
+            type: "기본",
+            q: "프랑크 왕국이 서로마 영내에 세워진 다른 게르만 왕국들보다 오랫동안 번영할 수 있었던 이유로 알맞은 것은?",
+            options: ["신항로를 개척하여 무역을 독점해서", "이동 거리가 짧고 로마 가톨릭으로 개종해서", "철저한 군현제를 시행하여 황제권을 강화해서", "크리스트교를 배척하고 전통 신앙을 고수해서", "로마 원주민들을 철저히 노예로 삼아서"],
+            ans: 1,
+            exp: "프랑크 왕국은 본거지 인근으로 이동 거리가 짧았고, 클로비스가 로마 가톨릭으로 개종하여 원주민과 융화했습니다."
+          },
+          {
+            type: "기본",
+            q: "카롤루스 마그누스의 업적에 대한 설명으로 옳은 것은?",
+            options: ["투르·푸아티에 전투에서 이슬람군 격퇴", "베르됭 조약을 체결하여 영토 분할", "교황 레오 3세로부터 서로마 황제관 대관", "성상 파괴령을 반포하여 동서 교회 분열", "로마 대법전을 편찬하여 법률 집대성"],
+            ans: 2,
+            exp: "카롤루스 마그누스는 800년 교황 레오 3세로부터 서로마 황제의 관을 받았습니다."
+          },
+          {
+            type: "심화",
+            q: "프랑크 왕국의 분열 과정에서 오늘날 프랑스, 독일, 이탈리아의 기원이 된 두 조약으로 짝지어진 것은?",
+            options: ["베르됭 조약 - 메르센 조약", "보름스 협약 - 토르데시야스 조약", "낭트 칙령 - 베스트팔렌 조약", "위트레흐트 조약 - 빈 의정서", "아우크스부르크 화의 - 카노사의 굴욕"],
+            ans: 0,
+            exp: "843년 베르됭 조약과 870년 메르센 조약을 통해 프랑크 왕국이 3국으로 영구 분열되었습니다."
+          },
+          {
+            type: "심화",
+            q: "카롤루스 마그누스가 이룩한 문화적 의의로 가장 적절한 것은?",
+            options: ["비잔티움 문화와 이슬람 문화를 융합함", "로마 문화, 크리스트교, 게르만 요소를 결합하여 서유럽 문화권 형성", "헬레니즘 문화를 계승하여 인본주의적 르네상스를 꽃피움", "세속 군주권을 교황권 아래 완전히 굴복시킴", "계몽사상을 바탕으로 절대군주제를 확립함"],
+            ans: 1,
+            exp: "카롤루스 마그누스 시대에는 로마 문화, 크리스트교, 게르만족의 전통이 결합되어 중세 서유럽 문화의 기틀이 형성되었습니다."
+          },
+          {
+            type: "심화",
+            q: "클로비스가 가톨릭(아타나시우스파)으로 개종함으로써 얻은 가장 큰 정치적 이점은?",
+            options: ["이슬람 세력과의 평화 협정 체결", "로마 교회의 지지와 로마계 주민들과의 융화", "동로마 제국 황제로부터의 완전한 영토 승인", "비잔티움 제국에 맞선 성상 숭배 금지 칙령 수용", "바이킹의 침략을 종교적으로 방어"],
+            ans: 1,
+            exp: "아리우스파가 아닌 정통 아타나시우스파 가톨릭을 수용함으로써 현지 로마인과 가톨릭 교회의 지지를 얻었습니다."
+          }
+        ],
+        blanks: [
+          { q: "훈족의 이동에 밀려 대이동을 시작한 (        )족은 서로마 제국 영내에 여러 국가를 세웠다.", a: "게르만" },
+          { q: "프랑크 왕국의 (        )는 로마 가톨릭으로 개종하여 교회의 강력한 지지를 확보하였다.", a: "클로비스" },
+          { q: "800년 교황 레오 3세는 (                  )에게 서로마 제국의 황제관을 수여하였다.", a: "카롤루스 마그누스" }
+        ],
+        essays: [
+          {
+            q: "카롤루스 마그누스가 형성한 '서유럽 문화권'을 구성하는 3대 핵심 요소를 서술하시오.",
+            keywords: ["로마 문화", "크리스트교", "게르만 문화"],
+            modelAns: "카롤루스 마그누스는 고대 로마 문화, 크리스트교, 그리고 게르만 문화(전통)를 융합하여 서유럽 문화권의 기틀을 확립하였습니다."
           }
         ]
       },
       {
-        id: "36-37",
-        badge: "36~37차시 (교과서 90~93쪽)",
-        title: "① 서유럽에서 봉건 사회가 성립하다",
+        unit: "36-37차시: 봉건제의 성립과 크리스트교 발전",
+        summary: `
+          <ul>
+            <li><b>봉건제의 성립:</b> 노르만족, 마자르족, 이슬람 세력의 침입이라는 대외적 혼란 속에서 스스로를 지키기 위해 성립되었습니다.</li>
+            <li><b>주종 관계:</b> 기사와 영주 간에 토지(봉토)를 매개로 충성을 맹세하는 <b>쌍무적 계약 관계</b>였습니다.</li>
+            <li><b>장원제:</b> 영주가 지배하는 자급자족적 농촌 공동체로, 농민(농노)은 거주 이전의 자유가 없고 영주에게 부역과 공납을 바쳐야 했습니다.</li>
+            <li><b>교회 개혁 운동:</b> 성직 매매와 세속권의 간섭을 비판하며 <b>클뤼니 수도원</b>을 중심으로 개혁 운동이 일어났습니다.</li>
+            <li><b>카노사의 굴욕(1077):</b> 성직자 임명권(서임권)을 둘러싸고 교황 그레고리우스 7세와 신성 로마 제국 황제 하인리히 4세가 대립하였고, 결국 황제가 카노사 성문 밖에서 교황에게 굴복하였습니다. 이후 <b>보름스 협약(1122)</b>을 통해 교황이 서임권을 차지하였습니다.</li>
+          </ul>
+        `,
         timeline: [
-          { time: "9~10세기", title: "봉건 질서 성립", desc: "이민족 침입 혼란 속 주종제·장원제 형성", color: "blue", icon: "🛡️" },
-          { time: "11세기", title: "로마네스크 양식", desc: "반원형 아치와 둥근 천장 (피사 대성당)", color: "teal", icon: "🏛️" },
-          { time: "12세기", title: "스콜라 철학과 대학", desc: "신앙과 이성 조화, 자치적인 대학 출현", color: "amber", icon: "📖" },
-          { time: "12세기 이후", title: "고딕 양식 발달", desc: "뾰족한 탑, 색유리그림 (샤르트르 대성당)", color: "rose", icon: "⛪" }
+          { year: "910년", title: "클뤼니 수도원 창건", desc: "세속 권력과 성직 매매를 거부하고 순수한 수도 생활과 교회 정화 운동 전개" },
+          { year: "1077년", title: "카노사의 굴욕", desc: "서임권 투쟁 중 파문당한 하인리히 4세 황제가 교황 그레고리우스 7세에게 사죄" },
+          { year: "1122년", title: "보름스 협약", desc: "황제와 교황 간의 타협으로 성직자 서임권이 교황에게 있음을 공식 확인" },
+          { year: "12세기말", title: "교황권의 절정", desc: "교황 인노첸시오 3세 시기 '교황은 해, 황제는 달' 선포" }
         ],
-        sections: [
+        quizzes: [
           {
-            title: "1. 봉건 질서의 성립",
-            items: [
-              "<strong>배경:</strong> 프랑크 왕국의 분열, 바이킹·이슬람 세력 등 이민족의 침입으로 혼란 → 기사 계급 형성, 주종 관계와 장원제를 바탕으로 한 봉건 사회 성립.",
-              "<strong>주종제:</strong> 땅(봉토)을 매개로 한 주군과 봉신 간의 관계, 서로 의무를 지켜야 하는 <strong>계약 관계</strong> (주군은 기사에게 땅(봉토)을 주고 신하(봉신)로 삼음 / 봉신은 자기보다 강한 기사를 주군으로 섬기고 충성과 봉사를 맹세함).",
-              "<strong>장원제:</strong> 봉신의 봉토 운영 방식. 영주의 성, 교회, 경작지, 공동 방목지, 방앗간 등. 봉신이 <strong>영주</strong>가 됨 (주군의 간섭을 받지 않고 장원을 다스림).",
-              "<strong>농노:</strong> 영주에게 각종 시설의 사용료와 세금을 바침, 영주의 땅에서 농사지음, 영주의 허락 없이 장원을 떠날 수 없음, 결혼과 약간의 재산 소유 가능.",
-              "<strong>영향:</strong> 봉건 사회가 발전하면서 지방 세력 강화, 왕권 약화 → <strong>지방 분권적 정치 체제</strong> 발달."
-            ]
+            type: "기본",
+            q: "서유럽 봉건제의 주종 관계가 지닌 가장 중요한 특징은 무엇인가요?",
+            options: ["혈연에 기반한 종법적 관계", "황제에 대한 무조건적 복종 관계", "봉토를 매개로 한 쌍무적 계약 관계", "중앙 집권적인 관료제적 주종 관계", "노예와 주인 간의 종속적 관계"],
+            ans: 2,
+            exp: "서유럽 주종 관계는 쌍방이 의무를 다해야 유지되는 '쌍무적 계약 관계'였습니다."
           },
           {
-            title: "2. 중세 서유럽 문화",
-            items: [
-              "<strong>학문:</strong> 신학 중심, 신앙과 이성의 조화 강조한 <strong>스콜라 철학</strong> 발달 (토마스 아퀴나스의 『신학 대전』 편찬).",
-              "<strong>교육:</strong> 12세기 이후 유럽 곳곳에 <strong>대학</strong> 설립 (학생 또는 교사들이 모여 만든 일종의 공동체, 교회나 영주의 간섭에서 벗어나 자치적으로 운영).",
-              "<strong>건축:</strong> 11세기 유행 <strong>로마네스크 양식</strong>(둥근 천장과 반원형 아치가 특징, 피사 대성당) → 12세기 이후 유행 <strong>고딕 양식</strong>(뾰족한 탑과 화려한 색유리그림(스테인드글라스)이 특징, 샤르트르 대성당).",
-              "<strong>문학:</strong> 기사들의 영웅담과 사랑을 소재로 한 기사도 문학 유행 (『롤랑의 노래』 등)."
-            ]
-          }
-        ]
-      },
-      {
-        id: "38",
-        badge: "38차시 (교과서 96~97쪽)",
-        title: "② 중세 크리스트교 세계가 변화하다",
-        timeline: [
-          { time: "10세기 초", title: "클뤼니 수도원 운동", desc: "교회 세속화 개혁, 기도·연구·노동 집중", color: "blue", icon: "⛪" },
-          { time: "1077년", title: "카노사의 굴욕", desc: "성직자 임명권 대립, 황제 하인리히 4세 사죄", color: "teal", icon: "❄️" },
-          { time: "1122년", title: "보름스 협약", desc: "교황만이 성직자 임명권을 갖도록 최종 합의", color: "amber", icon: "📜" },
-          { time: "13세기", title: "교황권 절정", desc: "교황이 황제 뛰어넘는 최고 지배자로 군림", color: "rose", icon: "👑" },
-          { time: "13세기 후반", title: "아비뇽 유수", desc: "프랑스 왕 필리프 4세가 교황청을 프랑스로 이전", color: "indigo", icon: "🏰" },
-          { time: "14세기 후반", title: "교회의 대분열", desc: "로마와 아비뇽의 두 교황 대립, 교황 권위 하락", color: "teal", icon: "⚡" }
-        ],
-        sections: [
-          {
-            title: "1. 수도원 운동과 교황과 황제의 대립",
-            items: [
-              "<strong>수도원 운동:</strong> 봉건제 확대 → 교회가 세속화되어 성직자의 혼인, 성직 매매 같은 부패 발생 → 10세기 초 일부 <strong>클뤼니 수도원</strong>을 중심으로 교회 개혁 운동 전개 (기도, 고전 연구, 노동에 집중하는 삶 강조).",
-              "<strong>카노사의 굴욕 (1077):</strong> 교황 그레고리우스 7세가 세속 군주의 성직자 임명을 금지하자 성직자 임명권을 둘러싸고 신성 로마 제국 황제 하인리히 4세가 대립 → 교황이 황제를 파문함 → 황제가 교황이 머무는 <strong>카노사성에 가서 사죄함</strong> (눈을 맞으며 3일간 참회).",
-              "<strong>보름스 협약 (1122):</strong> 교황만이 <strong>성직자 임명권</strong>을 가질 수 있다고 결정함.",
-              "<strong>교황권의 성장:</strong> 교황이 황제를 뛰어넘는 크리스트교 세계의 최고 지배자가 됨 → 13세기 무렵 <strong>교황권이 절정</strong>에 이름."
-            ]
+            type: "기본",
+            q: "중세 장원의 '농노'에 대한 설명으로 옳은 것은?",
+            options: ["거주 이전의 자유가 보장되었다.", "결혼을 할 수 없고 재산을 소유할 수 없는 노예였다.", "영주에게 부역과 공납을 바치고 시설 이용세를 냈다.", "영주의 허락 없이 장원을 자유롭게 떠날 수 있었다.", "직접 영주 재판권을 행사하여 재판을 열었다."],
+            ans: 2,
+            exp: "농노는 노예와 달리 가정을 꾸리고 사유 재산을 가질 수 있었으나, 거주 이전의 자유가 없고 부역과 공납의 의무를 졌습니다."
           },
           {
-            title: "2. 교황권의 쇠퇴",
-            items: [
-              "<strong>아비뇽 유수:</strong> 13세기 후반 프랑스 국왕 필리프 4세가 재정 부족 문제를 해결하기 위해 성직자에게 세금을 걷으려 함 → 교황 보니파키우스 8세의 반대 → 교황 사망 → 국왕이 이탈리아 로마에 있던 <strong>교황청을 프랑스 아비뇽으로 옮김</strong> (이후 약 70년 동안 7대에 걸친 교황들이 아비뇽에서 지냄).",
-              "<strong>교회의 대분열 시대:</strong> 교황청이 다시 로마로 돌아간 뒤에도 로마와 아비뇽에서 각각 교황을 뽑음(약 40년 동안 지속) → 로마 교황과 아비뇽 교황이 서로 정통성을 내세우며 대립 → <strong>교황의 권위 하락</strong>."
-            ]
-          }
-        ]
-      },
-      {
-        id: "39",
-        badge: "39차시 (교과서 98~99쪽)",
-        title: "③ 이슬람 세계와 크리스트교 세계가 충돌하고 교류하다",
-        timeline: [
-          { time: "11세기", title: "셀주크 튀르크 바그다드 정복", desc: "아바스 칼리프로부터 술탄 칭호 획득", color: "blue", icon: "🌙" },
-          { time: "11세기 후반", title: "성지 예루살렘 점령", desc: "비잔티움 제국 위협, 황제의 지원 요청", color: "teal", icon: "⚔️" },
-          { time: "1095년", title: "클레르몽 공의회", desc: "교황 우르바누스 2세의 전쟁 참여 호소", color: "amber", icon: "📣" },
-          { time: "200여 년간", title: "십자군 전쟁 전개", desc: "성지 회복 실패, 교황 권위 및 기사 세력 약화", color: "rose", icon: "🛡️" },
-          { time: "전쟁 이후", title: "지중해 무역권 번성", desc: "베네치아 등 무역 번성, 왕권 강화로 중앙 집권 촉진", color: "indigo", icon: "⛵" }
-        ],
-        sections: [
-          {
-            title: "1. 셀주크 튀르크의 성장과 십자군 전쟁",
-            items: [
-              "<strong>셀주크 튀르크의 성장:</strong> 11세기경 중앙아시아에서 유목 민족인 셀주크 튀르크가 성장하여 대제국을 세움. 바그다드 정복, 아바스 왕조의 칼리프로부터 <strong>술탄</strong>의 칭호를 얻음 → 영토를 넓히는 과정에서 크리스트교 세계와 마찰.",
-              "<strong>십자군 전쟁 배경:</strong> 11세기 후반 셀주크 튀르크가 성지 <strong>예루살렘</strong>을 점령, 비잔티움 제국 위협 → 비잔티움 제국 황제가 로마 교황에게 도움 요청 → 교황 우르바누스 2세가 <strong>클레르몽 공의회</strong>에서 성지를 되찾자고 전쟁 참여를 호소함.",
-              "<strong>전개 및 결과:</strong> 제후, 기사, 상인, 농민 등이 호응하여 전쟁 시작 → 200여 년 동안 여러 차례에 걸쳐 일어남 → 전쟁에 참여한 사람들의 이해관계에 따라 점차 본래의 목적을 잃음 → <strong>성지 회복 실패</strong>.",
-              "<strong>서유럽 사회의 변화:</strong> 전쟁을 이끈 교황의 권위 하락, 전쟁에 참여한 제후와 기사 세력 약화, 상대적으로 <strong>왕권 강화</strong> → 서유럽의 여러 나라가 중앙 집권 국가로 성장하는 데 영향을 줌.",
-              "<strong>셀주크 튀르크의 쇠퇴:</strong> 수도 이전으로 국력 약화, 13세기 중반 <strong>몽골군의 침입으로 쇠퇴</strong>."
-            ]
+            type: "기본",
+            q: "성직자 서임권 문제를 둘러싸고 교황 그레고리우스 7세와 충돌하여 파문당한 신성 로마 제국 황제는?",
+            options: ["클로비스", "카롤루스 마그누스", "하인리히 4세", "펠리페 2세", "루이 14세"],
+            ans: 2,
+            exp: "하인리히 4세는 교황에 맞서다 파문당하여 1077년 카노사에서 무릎을 꿇었습니다."
           },
           {
-            title: "2. 지중해 무역권의 성장과 문화 교류",
-            items: [
-              "<strong>지중해 무역권 성장:</strong> 유럽 상인들이 배로 십자군을 성지에 데려다주고 아시아의 특산물(염료, 비단, 향신료 등 사치품)을 싣고 돌아와 유럽에 팔면서 부를 쌓음 → <strong>베네치아, 제노바, 피사 등 지중해 연안 도시들 번성</strong>.",
-              "<strong>문화 교류:</strong> 비잔티움 제국의 고전 문화, 이슬람 세계의 자연 과학, 중국의 <strong>제지술</strong> 등이 유럽에 소개됨."
-            ]
-          }
-        ]
-      },
-      {
-        id: "40",
-        badge: "40차시 (교과서 100~101쪽)",
-        title: "④ 중세 서유럽 사회가 위기와 변화를 맞다",
-        timeline: [
-          { time: "14세기 중반", title: "흑사병 유행", desc: "인구 감소, 노동력 부족으로 농노 처우 개선", color: "rose", icon: "☠️" },
-          { time: "14세기 후반", title: "농민 반란 발생", desc: "자크리의 난, 와트 타일러의 난", color: "amber", icon: "🔥" },
-          { time: "중세 말", title: "도시 길드와 자치권", desc: "상인·수공업자 길드 결성, 영주로부터 자치권 획득", color: "teal", icon: "🏛️" },
-          { time: "1337~1453", title: "백년 전쟁", desc: "영·프 왕위 계승 문제, 프랑스 승리(중앙 집권 발판)", color: "blue", icon: "⚔️" },
-          { time: "1455~1485", title: "장미 전쟁", desc: "영국 봉건 영주 대거 몰락, 왕권 강화 달성", color: "indigo", icon: "🌹" }
-        ],
-        sections: [
-          {
-            title: "1. 봉건 사회의 해체",
-            items: [
-              "<strong>흑사병 유행:</strong> 인구 감소, 노동력 부족 → 영주들이 <strong>농노(농민)의 처우 개선</strong>, 농민의 지위 상승.",
-              "<strong>농민 반란 발생:</strong> 일부 지역에서 영주가 줄어든 수입을 보충하기 위해 농민들을 억압함 → <strong>자크리의 난, 와트 타일러의 난</strong> 등 농민 반란 발생.",
-              "<strong>농노 신분 해방:</strong> 상업과 도시 성장, 화폐 경제 발달 → 영주가 농노에게 돈을 받고 농노 신분을 해방시켜 줌 → <strong>장원 해체, 중세 봉건 사회의 동요</strong>."
-            ]
+            type: "심화",
+            q: "10~11세기 세속 군주의 간섭과 성직 매매 등 교회의 타락을 비판하며 청빈과 정결을 내세운 교회 개혁 운동의 중심지는?",
+            options: ["베르됭 수도원", "클뤼니 수도원", "카노사 성당", "보름스 대성당", "성 소피아 대성당"],
+            ans: 1,
+            exp: "클뤼니 수도원은 세속 권력으로부터 교회의 독립과 엄격한 계율 회복을 주장하며 교회 개혁을 이끌었습니다."
           },
           {
-            title: "2. 도시의 발전과 중앙 집권 국가의 등장",
-            items: [
-              "<strong>도시의 발전:</strong> 상업 활발, 원거리 무역 확대. 도시의 상인과 수공업자들이 동업 조합인 <strong>길드</strong>를 결성하고 부를 쌓은 도시민들이 영주로부터 <strong>자치권 획득</strong>(특허장을 받음).",
-              "<strong>기사 계급 몰락 & 왕권 강화:</strong> 장원 해체와 영주 세력 약화, 새로운 무기 등장으로 기사 계급 몰락 → 새롭게 성장한 도시 상공업자들이 국왕을 경제적으로 돕거나 관료로 일함 → 국왕이 관료와 군대를 정비함.",
-              "<strong>백년 전쟁:</strong> 14세기 중반 영국과 프랑스에서 왕위 계승 문제 발생 → <strong>프랑스가 승리</strong>하여 중앙 집권 국가로 성장하는 발판 마련.",
-              "<strong>장미 전쟁:</strong> 영국의 왕위 계승 문제 발생 → 전쟁에 참여한 많은 봉건 영주의 몰락 → <strong>왕권 강화, 중앙 집권 국가의 모습을 갖추어 감</strong>."
-            ]
-          }
-        ]
-      },
-      {
-        id: "41",
-        badge: "41차시 (교과서 102~103쪽)",
-        title: "⑤ 유럽에서 르네상스가 일어나다",
-        timeline: [
-          { time: "14~15세기", title: "이탈리아 르네상스", desc: "인문주의, 다빈치·미켈란젤로, 원근법 발달", color: "blue", icon: "🎨" },
-          { time: "15세기 중반", title: "활판 인쇄술 발명", desc: "구텐베르크의 발명으로 지식·사상 급속 보급", color: "teal", icon: "📖" },
-          { time: "16세기 이후", title: "알프스 이북 확산", desc: "사회·교회 비판 (우신예찬, 유토피아)", color: "amber", icon: "✍️" },
-          { time: "16세기", title: "지동설 등장", desc: "코페르니쿠스·갈릴레이의 우주관 대변혁", color: "rose", icon: "🔭" }
-        ],
-        sections: [
-          {
-            title: "1. 이탈리아의 르네상스",
-            items: [
-              "<strong>르네상스의 의미:</strong> 고대 그리스·로마 문화를 되살려 인간 중심의 새로운 문화를 만들려고 한 움직임.",
-              "<strong>근본정신:</strong> 인간의 개성과 능력을 중시하는 <strong>인문주의</strong> 발달.",
-              "<strong>배경:</strong> 고대 로마의 문화유산 보존, 지중해 무역으로 경제적 번영, 비잔티움 제국 학자들의 활발한 고전 문화 연구.",
-              "<strong>문학:</strong> 보카치오의 『데카메론』 (인간의 욕망을 솔직히 표현된 책).",
-              "<strong>미술:</strong> 레오나르도 다빈치, 미켈란젤로, 라파엘로 등이 인체의 아름다움을 사실적으로 표현 (<strong>원근법</strong> 등장).",
-              "<strong>건축:</strong> 대칭과 조화(비례)를 중시하는 르네상스 양식 발달 (<strong>성 베드로 대성당</strong>)."
-            ]
+            type: "심화",
+            q: "카노사의 굴욕 이후 장기간 이어진 서임권 투쟁을 매듭짓고, 교황이 성직자 임명권을 공식적으로 차지하게 된 협약은?",
+            options: ["베르됭 조약", "메르센 조약", "보름스 협약", "낭트 칙령", "베스트팔렌 조약"],
+            ans: 2,
+            exp: "1122년 보름스 협약을 통해 성직자 서임권은 교황에게 귀속되었습니다."
           },
           {
-            title: "2. 알프스 이북의 르네상스와 과학·기술",
-            items: [
-              "<strong>알프스 이북의 르네상스 (16세기 이후):</strong> <strong>현실 사회와 교회의 문제점을 비판하는 경향이 강함</strong>.",
-              "<strong>문학 발달:</strong> 에라스뮈스의 『우신예찬』(교황과 성직자의 부패 풍자), 토머스 모어의 『유토피아』(영국 사회 비판), 세르반테스의 『돈키호테』(몰락하는 기사 풍자).",
-              "<strong>천문학:</strong> 코페르니쿠스와 갈릴레이가 주장한 <strong>지동설</strong> → 중세 교회의 천동설을 믿었던 당시 사람들의 우주관에 큰 변화를 가져옴.",
-              "<strong>활판 인쇄술:</strong> <strong>구텐베르크</strong>의 활판 인쇄술 발명 → 지식과 사상 보급에 기여."
-            ]
+            type: "심화",
+            q: "'교황은 해, 황제는 달'이라는 말을 남기며 중세 교황권의 최전성기를 상징하는 인물은?",
+            options: ["레오 3세", "그레고리우스 7세", "인노첸시오 3세", "우르바누스 2세", "보니파키우스 8세"],
+            ans: 2,
+            exp: "13세기 초 교황 인노첸시오 3세 시기에 교황권은 유럽의 모든 세속 권력을 압도하며 절정에 달했습니다."
           }
-        ]
-      },
-      {
-        id: "42-43",
-        badge: "42~43차시 (교과서 108~111쪽)",
-        title: "① 송이 발전하고 북방 민족이 성장하다",
-        timeline: [
-          { time: "960년", title: "송 건국", desc: "조광윤의 문치주의 정책 및 전시 제도 도입", color: "blue", icon: "📜" },
-          { time: "10~11세기", title: "북방 민족 대립", desc: "거란(요)·서하(탕구트)의 압박과 평화 대가 지불", color: "teal", icon: "🐎" },
-          { time: "11세기 후반", title: "왕안석의 개혁", desc: "민생 안정과 부국강병 추진 (보수파 반대로 실패)", color: "amber", icon: "⚖️" },
-          { time: "1127년", title: "남송 성립", desc: "금의 공격으로 남쪽 천도, 바닷길 무역(시박사) 번성", color: "rose", icon: "⛵" },
-          { time: "12세기", title: "성리학 집대성", desc: "주희의 성리학 완성 (동아시아 통치 이념)", color: "indigo", icon: "📚" }
         ],
-        sections: [
-          {
-            title: "1. 송의 건국과 북방 민족의 성장",
-            items: [
-              "<strong>송의 건국과 문치주의:</strong> 절도사 출신 조광윤(태조)이 건국. 황제의 군사권 강화, 절도사의 권한 약화, 문인을 우대하는 <strong>문치주의</strong> 정책 실시, <strong>전시 제도</strong> 도입 → <strong>사대부 계층 형성, 군사력 약화</strong>.",
-              "<strong>왕안석의 개혁:</strong> 북방 민족에게 평화 유지의 대가 제공 → 재정 악화 → 민생 안정과 부국강병을 목표로 개혁 시도 → 실패. 금의 공격으로 남쪽으로 수도 이전(남송 성립).",
-              "<strong>북방 민족:</strong> 거란(요 - 발해 멸망시킴), <strong>서하</strong>(탕구트 건국, 동서 무역로 차지), 금(여진 건국, 송과 연합하여 요 멸망 후 송 공격).",
-              "<strong>통치 방식과 문화:</strong> <strong>이원적인 통치 방식</strong>(자신의 부족은 고유의 부족제로 다스리고, 한족은 중국식 통치 방식인 주현제로 다스림), 자신들만의 <strong>고유 문자</strong> 제작."
-            ]
-          },
-          {
-            title: "2. 송의 경제, 사회, 동아시아·인도양 교역권",
-            items: [
-              "<strong>경제 발달:</strong> 새로운 품종의 벼와 농법 도입, 상공업 발달, 지폐·동전 사용, 도시 발달.",
-              "<strong>사회와 문화:</strong> 화약 무기, 나침반, 활판 인쇄술이 실생활에 사용됨. <strong>서민 문화</strong> 발달(도시 서민들의 만담, 연극, 무용 등). 우주의 원리와 인간의 본성 탐구하는 <strong>주희의 성리학</strong> 완성.",
-              "<strong>교역권의 성장:</strong> 북방 민족이 육로를 이용하여 송은 <strong>바닷길</strong>을 따라 교역함. 주요 항구에 세금과 무역을 담당하는 <strong>시박사</strong> 설치."
-            ]
-          }
-        ]
-      },
-      {
-        id: "44-45",
-        badge: "44~45차시 (교과서 112~115쪽)",
-        title: "② 몽골 제국이 성립하고 동서 문화 교류가 늘다",
-        timeline: [
-          { time: "1206년", title: "몽골 제국 수립", desc: "칭기즈 칸이 부족 통일 후 대제국 건설", color: "blue", icon: "🐎" },
-          { time: "1271년", title: "원 국호 제정", desc: "쿠빌라이 칸의 대도(베이징) 천도, 남송 정복", color: "teal", icon: "👑" },
-          { time: "원대", title: "몽골 제일주의", desc: "몽골인·색목인 우대 및 파스파 문자 제정", color: "amber", icon: "📜" },
-          { time: "원대", title: "역참제와 교역망", desc: "패자를 지닌 사신·상인의 안전 이동 (초원·비단·바닷길)", color: "rose", icon: "🐎" },
-          { time: "13~14세기", title: "동서 문화 교류", desc: "마르코 폴로 방문, 곽수경의 『수시력』 제작", color: "indigo", icon: "🌍" }
+        blanks: [
+          { q: "영주와 기사 사이에는 토지를 매개로 맺은 (             ) 계약 관계가 형성되었다.", a: "쌍무적" },
+          { q: "1077년 신성 로마 제국 황제 하인리히 4세가 교황에게 용서를 구한 사건을 (              )이라 한다.", a: "카노사의 굴욕" },
+          { q: "1122년 교황과 황제가 맺은 (             ) 협약을 통해 교황이 성직자 서임권을 확보하였다.", a: "보름스" }
         ],
-        sections: [
+        essays: [
           {
-            title: "1. 몽골 제국의 성립과 원의 중국 지배",
-            items: [
-              "<strong>성립:</strong> <strong>칭기즈 칸</strong>이 몽골 부족을 통일하고 제국 수립(1206). 사후 독자적인 여러 <strong>울루스</strong>의 느슨한 연합으로 유지.",
-              "<strong>원의 중국 지배:</strong> <strong>쿠빌라이 칸</strong>이 대도(베이징) 천도, 국호를 <strong>원</strong>으로 변경, 남송 정복. 여러 민족의 언어를 표기하고자 공용 문자인 <strong>파스파 문자</strong> 제작.",
-              "<strong>몽골 제일주의:</strong> 몽골인(주요 관직 독점)과 색목인(재정·행정 담당) 우대, 한인과 남인 차별 대우."
-            ]
-          },
-          {
-            title: "2. 교역망과 동서 문화 교류",
-            items: [
-              "<strong>경제와 서민 문화:</strong> 목화 재배로 면직물 발달, 지폐인 <strong>교초</strong> 널리 사용. 구어체 소설과 희곡, <strong>잡극</strong> 유행.",
-              "<strong>교역로 정비:</strong> 도로망 정비, 관리나 사신에게 숙식과 말을 제공하는 <strong>역참</strong> 설치, <strong>패자</strong>를 가지고 안전하게 여행. 초원길·비단길·바닷길 연결.",
-              "<strong>문화 교류:</strong> 마르코 폴로(『동방견문록』 저술)와 이븐 바투타 방문. 이슬람의 역법·천문학이 전해져 곽수경이 <strong>『수시력』</strong>을 만듦. 화약 무기, 나침반, 인쇄술 서양 전파."
-            ]
-          }
-        ]
-      },
-      {
-        id: "46-47",
-        badge: "46~47차시 (교과서 116~119쪽)",
-        title: "① 명과 청이 중국을 지배하다",
-        timeline: [
-          { time: "1368년", title: "명 건국", desc: "홍무제 주원장의 재상제 폐지, 6부 직접 통치", color: "blue", icon: "👑" },
-          { time: "15세기 초", title: "영락제의 전성기", desc: "자금성 건설(베이징 천도), 정화의 대항해 파견", color: "teal", icon: "⛵" },
-          { time: "1616년", title: "청 건국과 입관", desc: "누르하치 후금 건국 → 청 개칭 후 베이징 점령", color: "amber", icon: "🏹" },
-          { time: "17~18세기", title: "청의 한족 통치", desc: "회유책(만한병용제)과 강경책(변발·호복) 병행", color: "rose", icon: "📜" },
-          { time: "명·청대", title: "은 경제와 세제", desc: "명의 일조편법 → 청의 지정은제 (은으로 납부)", color: "indigo", icon: "🪙" }
-        ],
-        sections: [
-          {
-            title: "1. 명의 성립과 발전",
-            items: [
-              "<strong>홍무제의 정책:</strong> 황제권 강화를 위해 <strong>재상제 폐지</strong>, 6부 직접 통치, 토지·호적 대장(이갑제, 어린도책, 부역황책) 작성. 한족 전통 회복(유교 이념 부활-육유 반포, 과거제 정비).",
-              "<strong>영락제의 정책:</strong> <strong>자금성</strong> 건설 후 베이징으로 천도. 국력을 과시하고 여러 나라와 <strong>조공 관계(조공·책봉 체제)</strong>를 맺고자 <strong>정화의 함대</strong>를 해외에 파견."
-            ]
-          },
-          {
-            title: "2. 청의 성립과 한족 통치",
-            items: [
-              "<strong>성립:</strong> 누르하치가 후금 건국 → 홍타이지가 국호를 청으로 변경 → 베이징 점령.",
-              "<strong>회유책:</strong> 중요한 관직에 만주족과 한족 함께 등용(<strong>만한병용제</strong>), 유학 교육 장려, 과거제 실시, 대규모 편찬 사업(『사고전서』).",
-              "<strong>강경책:</strong> 만주족의 풍습인 <strong>변발과 호복 강요</strong>, 청 왕조 비판 서적 금지(문자옥).",
-              "<strong>전성기:</strong> 강희제·옹정제·건륭제 때 통치 제도 정비와 영토 확장, 건륭제 때 최대 영토 차지."
-            ]
-          },
-          {
-            title: "3. 명·청의 경제, 사회, 대외 교류",
-            items: [
-              "<strong>은 경제와 세제 개혁:</strong> 유럽과 일본으로부터 다량의 은 유입 → 은을 화폐로 사용, 은으로 세금 납부.<br>• <strong>명: 일조편법</strong> (지세와 정세(인두세)를 은으로 통일 납부)<br>• <strong>청: 지정은제</strong> (정세를 지세에 포함시켜 지세만 은으로 납부)",
-              "<strong>사회와 학문:</strong> <strong>신사</strong>층의 형성과 학문 발전. 명대 <strong>양명학</strong>(이론과 형식보다 실천 강조) → 청대 <strong>고증학</strong>(유교 경전을 실증적으로 연구).",
-              "<strong>대외 교류:</strong> 명은 조공 관계 통한 교류(민간 해상 무역 허용). 청은 광저우 한 곳을 개방하고 <strong>공행</strong> 무역만 허용.",
-              "<strong>문물 교류:</strong> 이탈리아 선교사 <strong>마테오 리치</strong>가 세계 지도인 『<strong>곤여만국전도</strong>』를 제작하여 동아시아 여러 나라의 세계관에 큰 영향을 줌."
-            ]
-          }
-        ]
-      },
-      {
-        id: "49",
-        badge: "49차시 (교과서 122~123쪽)",
-        title: "③ 인도에서 무굴 제국이 발전하다",
-        timeline: [
-          { time: "1526년", title: "무굴 제국 건국", desc: "바부르가 델리를 정복하고 이슬람 왕조 수립", color: "blue", icon: "⚔️" },
-          { time: "16세기 후반", title: "아크바르 황제", desc: "인두세(지즈야) 폐지, 종교 관용 정책", color: "teal", icon: "🕊️" },
-          { time: "17세기 중반", title: "타지마할 건립", desc: "샤 자한의 황후 묘당 (인도·이슬람 융합)", color: "amber", icon: "🕌" },
-          { time: "17세기 후반", title: "아우랑제브 황제", desc: "최대 영토 차지, 지즈야 부활 (제국 쇠퇴 원인)", color: "rose", icon: "🏹" }
-        ],
-        sections: [
-          {
-            title: "1. 무굴 제국의 성립과 발전",
-            items: [
-              "<strong>성립:</strong> <strong>바부르</strong>가 인도의 델리를 정복하고 이슬람 왕조를 세움(1526).",
-              "<strong>아크바르 황제:</strong> 인도 북부 대부분 차지. 비이슬람교도에게 거두던 <strong>인두세(지즈야) 폐지</strong>, 힌두교도에게 관직을 주는 등 종교 다양성을 존중하는 정책을 펼침.",
-              "<strong>아우랑제브 황제:</strong> 인도 남부를 정복하여 <strong>최대 영토 차지</strong>. 이슬람교가 아닌 종교 탄압(<strong>지즈야 부활</strong>, 힌두교 사원 파괴) → 백성의 불만 초래."
-            ]
-          }
-        ]
-      },
-      {
-        id: "50-51",
-        badge: "50~51차시 (교과서 126~129쪽)",
-        title: "① 오스만 제국이 성장하다",
-        timeline: [
-          { time: "1299년", title: "오스만 건국", desc: "오스만 1세가 튀르크 부족들을 모아 출발", color: "blue", icon: "🌙" },
-          { time: "1453년", title: "이스탄불 천도", desc: "메호메트 2세의 비잔티움 정복 (콘스탄티노폴리스 함락)", color: "teal", icon: "🏰" },
-          { time: "16세기 초", title: "술탄·칼리프제", desc: "정치·종교 최고 지배자 권한 확립", color: "amber", icon: "👑" },
-          { time: "16세기 중반", title: "쉴레이만 1세", desc: "헝가리 정복, 빈 포위 공격, 지중해 제패", color: "rose", icon: "⚔️" },
-          { time: "제국 발전", title: "밀레트와 예니체리", desc: "종교 자치 보장(밀레트)과 최정예 부대 육성", color: "indigo", icon: "🛡️" }
-        ],
-        sections: [
-          {
-            title: "1. 오스만 제국의 발전",
-            items: [
-              "<strong>메호메트 2세:</strong> 비잔티움 제국 정복, 콘스탄티노폴리스로 천도하고 <strong>이스탄불</strong>이라고 부름.",
-              "<strong>술탄·칼리프제:</strong> 칼리프의 칭호를 넘겨받아 이슬람 세계의 정치적·종교적 최고 지배자가 됨.",
-              "<strong>전성기 (쉴레이만 1세):</strong> 헝가리 정복, 오스트리아의 수도 빈 공격, 유럽 연합 함대 격파 → 지중해 장악, 세 대륙에 걸친 대제국 완성."
-            ]
-          },
-          {
-            title: "2. 통치 방식과 문화",
-            items: [
-              "<strong>관용 정책 (밀레트):</strong> 비이슬람교도에게 세금(인두세)을 내면 독자적인 종교 공동체(<strong>밀레트</strong>)의 자치 인정.",
-              "<strong>예니체리 양성:</strong> 정복지의 크리스트교도를 이슬람교로 개종시킨 후 훈련과 교육을 받게 하여 술탄의 친위 정예부대로 양성.",
-              "<strong>문화:</strong> <strong>커피하우스</strong>를 중심으로 커피 문화 유행. 비잔티움 양식의 영향을 받아 푸른색 타일로 장식된 <strong>술탄 아흐메트 사원(블루 모스크)</strong> 건립."
-            ]
-          }
-        ]
-      },
-      {
-        id: "52-53",
-        badge: "52~53차시 (교과서 130~134쪽)",
-        title: "② 새로운 항로를 개척하다",
-        timeline: [
-          { time: "1488년", title: "희망봉 도착", desc: "바르톨로메우 디아스 (아프리카 남단)", color: "blue", icon: "🧭" },
-          { time: "1492년", title: "서인도 제도", desc: "콜럼버스 (대서양 횡단 항로 개척)", color: "teal", icon: "⛵" },
-          { time: "1498년", title: "인도 캘리컷", desc: "바스쿠 다가마 (희망봉 경유 동쪽 항로)", color: "amber", icon: "🇮🇳" },
-          { time: "1519~1522", title: "세계 일주", desc: "마젤란 함대 (태평양 횡단 최초 일주)", color: "rose", icon: "🌏" },
-          { time: "16세기", title: "문명 파괴·삼각 무역", desc: "아스테카·잉카 정복, 대서양 노예 삼각 무역", color: "indigo", icon: "🔗" }
-        ],
-        sections: [
-          {
-            title: "1. 신항로 개척의 배경과 전개",
-            items: [
-              "<strong>배경:</strong> 마르코 폴로의 『동방견문록』, 동방 상품 독점으로 유럽인들이 새로운 항로 모색, 천문학·지리학 발전, <strong>나침반</strong> 등 항해 도구와 삼각돛의 캐러벨선 제조 기술 발달.",
-              "<strong>포르투갈 (동쪽 항로):</strong> 바르톨로메우 디아스(아프리카 남쪽 끝 희망봉 도착) → <strong>바스쿠 다가마</strong>(희망봉을 돌아 인도의 캘리컷에 도착).",
-              "<strong>에스파냐 (서쪽 항로):</strong> <strong>콜럼버스</strong>(대서양을 건너 서인도 제도 도착) → <strong>마젤란 함대</strong>(태평양을 가로질러 최초로 세계 일주 성공)."
-            ]
-          },
-          {
-            title: "2. 세계 교역망의 확립과 아메리카·아프리카의 변화",
-            items: [
-              "<strong>무역 중심지 이동:</strong> 지중해에서 <strong>대서양</strong>으로 무역 중심지 이동 → 유럽, 아메리카, 아프리카를 잇는 <strong>삼각 무역</strong> 형태로 발전. 여러 나라가 동인도 회사를 건립하여 아시아로 진출함.",
-              "<strong>유럽 사회의 변화:</strong> 아메리카의 새로운 작물 전래(옥수수, 감자, 카카오, 사탕수수 등), 아메리카의 금·은이 대규모로 유럽에 유입(물가 상승).",
-              "<strong>아메리카의 변화:</strong> 에스파냐에 의해 <strong>아스테카 문명(코르테스)</strong>과 <strong>잉카 문명(피사로)</strong> 파괴. 노동력 착취와 유럽 전염병(천연두, 홍역 등)으로 원주민 인구 감소.",
-              "<strong>아프리카의 변화:</strong> 아메리카 원주민의 인구 감소 → 아프리카 원주민을 노예로 동원(<strong>노예 무역</strong>) → 아프리카 인구 감소, 성비 불균형, 부족 간의 갈등 심화."
-            ]
-          }
-        ]
-      },
-      {
-        id: "54-55",
-        badge: "54~55차시 (교과서 135~139쪽)",
-        title: "③ 유럽에서 재정·군사 국가가 나타나다",
-        timeline: [
-          { time: "1517년", title: "루터 95개조 반박문", desc: "면벌부 판매 비판, 종교 개혁 시작", color: "blue", icon: "📜" },
-          { time: "16세기 중반", title: "칼뱅의 예정설", desc: "구원 예정, 근면·절약 강조 (상공업자 지지)", color: "teal", icon: "💼" },
-          { time: "1618~1648", title: "30년 전쟁", desc: "독일 종교 전쟁 종결 (베스트팔렌 조약)", color: "amber", icon: "⚔️" },
-          { time: "17세기 후반", title: "루이 14세", desc: "왕권신수설, 베르사유 궁전, 중상주의", color: "rose", icon: "👑" },
-          { time: "17~18세기", title: "과학 혁명과 계몽사상", desc: "지동설, 만유인력의 법칙, 사회 계약설", color: "indigo", icon: "💡" }
-        ],
-        sections: [
-          {
-            title: "1. 종교 개혁과 종교 전쟁",
-            items: [
-              "<strong>루터:</strong> 로마 교황이 신자들에게 면벌부 판매 → 루터의 <strong>『95개조 반박문』(1517)</strong> 발표 → 제후와 농민의 지지를 받음.",
-              "<strong>칼뱅:</strong> <strong>예정설</strong> 주장(구원은 이미 신에 의해 정해짐), 근면과 절약 강조, 부자가 되는 것은 신의 은혜라고 주장 → 상공업자들의 환영을 받음.",
-              "<strong>종교 전쟁:</strong> 로마 가톨릭교회(구교)와 신교의 대립 → 독일에서 30년 전쟁 발발 → <strong>베스트팔렌 조약</strong> 체결."
-            ]
-          },
-          {
-            title: "2. 재정·군사 국가와 과학·철학",
-            items: [
-              "<strong>특징:</strong> 화약 무기로 무장한 <strong>상비군</strong> 중심, <strong>관료제</strong> 확대, 수입은 제한하고 수출은 늘려 금과 은을 확보하는 <strong>중상주의</strong> 정책 실시.",
-              "<strong>프랑스:</strong> <strong>루이 14세</strong> 때 왕권 절정. <strong>왕권신수설</strong> 주장, 베르사유 궁전을 설립하여 권위 과시, 재무 장관 콜베르를 등용하여 중상주의 정책 추진.",
-              "<strong>과학과 철학:</strong> 갈릴레이의 지동설, 뉴턴의 만유인력 법칙 등 과학 혁명. 데카르트의 이성 강조, 로크의 사회 계약설 및 저항권.",
-              "<strong>계몽사상:</strong> 인간의 이성이 사회를 진보하게 한다고 믿음. 미국 혁명과 <strong>프랑스 혁명</strong>의 사상적 기반이 됨."
-            ]
-          }
-        ]
-      },
-      {
-        id: "56-57",
-        badge: "56~57차시 (교과서 144~147쪽)",
-        title: "① 영국 혁명이 일어나다 ~ ② 미국 혁명이 일어나다",
-        timeline: [
-          { time: "1628년", title: "영국 권리 청원", desc: "의회의 과세권 주장, 찰스 1세 승인 후 의회 해산", color: "blue", icon: "📜" },
-          { time: "1642~1649", title: "청교도 혁명", desc: "크롬웰 의회파 승리, 찰스 1세 처형 후 공화정", color: "teal", icon: "⚔️" },
-          { time: "1688~1689", title: "명예혁명과 권리장전", desc: "제임스 2세 축출, 공동 왕 추대, 입헌 군주제 기초", color: "amber", icon: "👑" },
-          { time: "1773년", title: "보스턴 차 사건", desc: "영국의 차 세금 부과 반발, 독립 전쟁 발단", color: "rose", icon: "🚢" },
-          { time: "1776년", title: "미국 독립 선언", desc: "조지 워싱턴 활약, 1783 독립 승인(파리 조약)", color: "indigo", icon: "🗽" },
-          { time: "1789년", title: "민주 공화국 수립", desc: "세계 최초 연방제·삼권 분립 민주 공화국 수립", color: "teal", icon: "🏛️" }
-        ],
-        sections: [
-          {
-            title: "1. 영국 혁명 (청교도 혁명 & 명예혁명)",
-            items: [
-              "<strong>청교도 혁명:</strong> 시민 계급과 지주 출신인 <strong>젠트리</strong> 성장. 찰스 1세의 과세에 맞서 의회가 <strong>권리 청원</strong> 제출 → 찰스 1세의 의회 해산 → 내전 발발 → <strong>크롬웰</strong>이 이끈 의회파의 승리(찰스 1세 처형, 공화정 수립).",
-              "<strong>명예혁명:</strong> 의회가 제임스 2세를 몰아내고 메리와 윌리엄을 공동 왕으로 세움 → 의회가 제출한 <strong>권리장전</strong>을 국왕이 받아들임 → 의회를 중심으로 한 <strong>입헌 군주제</strong>의 기초 마련."
-            ]
-          },
-          {
-            title: "2. 미국 혁명 (독립 전쟁)",
-            items: [
-              "<strong>발단:</strong> 영국 정부가 식민지로 들어오는 설탕과 차 등에 세금을 부과, 영국 동인도 회사에 차 독점 판매 허용 → <strong>보스턴 차 사건(1773)</strong>.",
-              "<strong>전개 및 결과:</strong> <strong>독립 선언(1776)</strong> 발표, 조지 워싱턴 총사령관 활약, 프랑스 지원 → 영국이 미국의 독립 승인(파리 조약, 1783).",
-              "<strong>의의:</strong> 연방제, 국민 주권, 삼권 분립의 헌법 제정 → 세계 최초의 <strong>민주 공화국</strong> 수립(조지 워싱턴 초대 대통령). 프랑스 혁명과 라틴 아메리카 독립에 영향."
-            ]
-          }
-        ]
-      },
-      {
-        id: "58-59",
-        badge: "58~59차시 (교과서 148~151쪽)",
-        title: "③ 프랑스 혁명이 일어나다 & 나폴레옹 시대",
-        timeline: [
-          { time: "1789년", title: "바스티유 습격 & 인권 선언", desc: "구제도의 모순 폭발, 국민 의회의 인권 선언 발표", color: "blue", icon: "🔥" },
-          { time: "1792~1793", title: "국민 공회와 로베스피에르", desc: "공화정 선포, 루이 16세 처형, 공포 정치", color: "teal", icon: "⚔️" },
-          { time: "1799년", title: "나폴레옹 통령 정부", desc: "쿠데타로 정권 장악, 『나폴레옹 법전』 편찬(1804)", color: "amber", icon: "📜" },
-          { time: "1806년", title: "대륙 봉쇄령 선포", desc: "영국 고립 목적으로 유럽 대륙과의 무역 금지", color: "rose", icon: "🛑" },
-          { time: "1812년", title: "러시아 원정 참패", desc: "혹독한 추위로 실패, 대프랑스 동맹에 패배 후 몰락", color: "indigo", icon: "❄️" }
-        ],
-        sections: [
-          {
-            title: "1. 프랑스 혁명의 전개",
-            items: [
-              "<strong>배경:</strong> <strong>구제도의 모순</strong> (제1신분 성직자와 제2신분 귀족은 면세 특권, 인구 약 98%인 제3신분 평민은 무거운 세금에 시달리면서도 정치 참여 못함). 계몽사상과 미국 혁명의 영향.",
-              "<strong>국민 의회:</strong> 삼부회 표결 방식 대립 → 테니스코트의 서약 → 바스티유 습격 → 봉건제 폐지 선언, <strong>인권 선언(1789)</strong> 발표.",
-              "<strong>국민 공회:</strong> 공화정 선포, 루이 16세 처형 → <strong>로베스피에르</strong>의 공포 정치(시민 불만 커짐) → 로베스피에르 처형.",
-              "<strong>총재 정부:</strong> 5명의 총재가 이끄는 정부 등장(혼란) → 나폴레옹의 쿠데타로 무너짐."
-            ]
-          },
-          {
-            title: "2. 나폴레옹 시대",
-            items: [
-              "<strong>통령 정부:</strong> 나폴레옹이 제1 통령 취임, <strong>『나폴레옹 법전』 편찬(1804)</strong>(새로운 시민 사회의 규범을 담음).",
-              "<strong>제1 제정:</strong> 국민 투표로 황제 즉위. 영국을 고립시킬 목적으로 유럽 대륙과 영국 간 무역 금지하는 <strong>대륙 봉쇄령</strong> 선포 → 러시아가 어기자 러시아 원정 단행 → 참패 → 몰락.",
-              "<strong>영향:</strong> 프랑스 혁명의 이념인 <strong>자유주의</strong>와 민족의 단결을 주장하는 <strong>민족주의</strong> 의식이 유럽 곳곳에 확산됨."
-            ]
-          }
-        ]
-      },
-      {
-        id: "60-61",
-        badge: "60~61차시 (교과서 152~155쪽)",
-        title: "④ 자유주의와 민족주의가 퍼져 나가다",
-        timeline: [
-          { time: "1814~1815", title: "빈 체제 성립", desc: "메테르니히 주도, 옛 영토와 지배권 복구 합의", color: "blue", icon: "🏰" },
-          { time: "1830년 7월", title: "프랑스 7월 혁명", desc: "샤를 10세 축출 → 루이 필리프 추대, 입헌 군주제 수립", color: "teal", icon: "👑" },
-          { time: "1848년 2월", title: "프랑스 2월 혁명", desc: "선거권 확대 요구 → 왕정 폐지 및 공화정 수립 (빈 체제 붕괴)", color: "amber", icon: "🔥" },
-          { time: "1838~1848", title: "영국 차티스트 운동", desc: "노동자들의 인민헌장 발표, 선거권 확대 요구", color: "rose", icon: "📜" },
-          { time: "1861년", title: "이탈리아 왕국 성립", desc: "카보우르의 중북부 통합 + 가리발디 의용대 활약", color: "indigo", icon: "🇮🇹" },
-          { time: "1861~1865", title: "미국 남북 전쟁", desc: "남북 갈등, 링컨의 노예 해방 선언(1863), 북부 승리", color: "teal", icon: "🇺🇸" },
-          { time: "1871년", title: "독일 제국 성립", desc: "비스마르크의 철혈 정책 승리 (오스트리아·프랑스 격파)", color: "rose", icon: "🇩🇪" }
-        ],
-        sections: [
-          {
-            title: "1. 빈 체제와 프랑스·영국의 자유주의 운동",
-            items: [
-              "<strong>빈 체제:</strong> 나폴레옹 몰락 후 오스트리아 재상 <strong>메테르니히</strong> 주도로 옛 영토와 지배권을 프랑스 혁명 이전으로 되돌리는 데 합의한 보수적 체제.",
-              "<strong>프랑스:</strong> 7월 혁명(샤를 10세 몰아내고 루이 필리프 왕으로 세움, 입헌 군주제) → <strong>2월 혁명(1848)</strong>(파리 시민·노동자들의 선거권 확대 요구 → 왕정 폐지, 공화정 수립, 메테르니히 추방으로 빈 체제 사실상 붕괴).",
-              "<strong>영국:</strong> 선거법 개정(부패 선거구 폐지, 중산 계급에게 선거권 부여) → 영국의 노동자들이 인민헌장을 발표하고 <strong>차티스트 운동</strong>을 벌임."
-            ]
-          },
-          {
-            title: "2. 이탈리아·독일의 통일과 미국의 남북 전쟁",
-            items: [
-              "<strong>이탈리아 통일:</strong> 카보우르의 중북부 통합 + <strong>가리발디</strong>가 의용대를 이끌고 시칠리아와 나폴리를 점령하여 사르데냐 왕국에 바침 → 이탈리아 왕국 탄생.",
-              "<strong>독일 통일:</strong> 프로이센의 재상 <strong>비스마르크</strong>의 <strong>철혈 정책</strong>(군사력 강화) → 오스트리아와 프랑스 격파 → 빌헬름 1세 황제 즉위, 독일 제국 성립.",
-              "<strong>미국의 남북 전쟁(1861~1865):</strong> 남부(노예제 대농장)와 북부(임금 노동자 공업)의 갈등 → 링컨 대통령 당선 → 남부 연방 탈퇴, 전쟁 발발 → 링컨의 <strong>노예 해방 선언(1863)</strong> → 북부 승리 → 대륙 횡단 철도 완성으로 세계적인 공업 국가로 성장."
-            ]
-          }
-        ]
-      },
-      {
-        id: "62",
-        badge: "62차시 (교과서 156~157쪽)",
-        title: "⑤ 라틴 아메리카 국가들이 독립하다",
-        timeline: [
-          { time: "18세기 말", title: "독립 배경", desc: "미국 독립·프랑스 혁명 영향, 나폴레옹 전쟁", color: "blue", icon: "🌍" },
-          { time: "1804년", title: "아이티 독립", desc: "흑인 노예 주도 라틴 아메리카 최초 독립국", color: "teal", icon: "🇭🇹" },
-          { time: "1821년", title: "멕시코 독립", desc: "이달고 신부의 민중 봉기 지휘, 공화정 수립", color: "amber", icon: "🇲🇽" },
-          { time: "1810~1820s", title: "볼리바르·산마르틴", desc: "콜롬비아, 베네수엘라, 칠레, 페루 연쇄 독립", color: "rose", icon: "⚔️" },
-          { time: "1823년", title: "미국 먼로 선언", desc: "유럽의 아메리카 대륙 간섭 불허 천명", color: "indigo", icon: "📜" }
-        ],
-        sections: [
-          {
-            title: "1. 라틴 아메리카의 민족 운동과 독립운동",
-            items: [
-              "<strong>배경:</strong> 18세기 무렵 미국의 독립과 프랑스 혁명의 영향, 나폴레옹 전쟁으로 에스파냐의 간섭 약화.",
-              "<strong>지도자:</strong> <strong>볼리바르</strong>와 <strong>산마르틴</strong> 같은 지도자들이 라틴 아메리카 각지에서 독립 투쟁을 이끎 (볼리바르는 베네수엘라, 콜롬비아, 페루, 볼리비아 독립 주도 / 산마르틴은 아르헨티나, 칠레, 페루 해방).",
-              "<strong>각국의 독립:</strong> <strong>아이티</strong>(흑인 노예들의 독립운동 전개 → 프랑스로부터 독립, 라틴 아메리카 최초로 독립국 건설(1804)), <strong>멕시코</strong>(이달고 신부가 민중 봉기를 지휘 → 에스파냐로부터 독립, 공화정 수립(1821)).",
-              "<strong>외국의 지원:</strong> 영국의 독립 지지(새로운 시장으로 이용하려 함), 미국의 <strong>먼로 선언</strong> 발표(유럽이 아메리카 대륙에 간섭하는 것을 허용하지 않겠다고 선언함)."
-            ]
+            q: "중세 장원의 '농노'가 고대 노예와 구별되는 차이점과 일반 자유민과의 차이점을 각각 서술하시오.",
+            keywords: ["가정", "재산", "거주 이전의 자유", "부역"],
+            modelAns: "농노는 고대 노예와 달리 가정을 꾸리고 토지나 농기구 등 개인 재산을 소유할 수 있었으나, 일반 자유민과 달리 거주 이전의 자유가 제한되었고 영주에게 노동(부역)과 각종 세금을 바쳐야 했습니다."
           }
         ]
       }
     ];
 
-    /* ========================================================
-       3. 기본 5지선다 문제 풀 (학습지 단어 철저 준수)
-       ======================================================== */
-    const BASIC_QUIZ_POOL = [
-      {
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        question: "4세기 말 훈족의 압박을 받아 대규모 이동을 하여 서로마 제국을 멸망(476)에 이르게 한 민족은?",
-        options: ["게르만족", "슬라브인", "노르만족", "아바스인", "몽골군"],
-        correctIndex: 0,
-        explanation: "학습지 1-(1): 4세기 말 훈족의 압박을 받아 게르만족이 대규모 이동을 하였습니다."
-      },
-      {
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        question: "800년 로마 교황(레오 3세)으로부터 서로마 황제의 관을 받아 서유럽 문화의 기틀을 마련한 프랑크 왕국의 전성기 인물은?",
-        options: ["클로비스", "카롤루스 대제", "피핀", "하인리히 4세", "필리프 4세"],
-        correctIndex: 1,
-        explanation: "학습지 1-(3): 프랑크 왕국의 전성기 (카롤루스 대제) 시기에 로마 교황으로부터 서로마 황제의 관을 받았습니다."
-      },
-      {
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        question: "카롤루스 대제 사후 프랑크 왕국이 서프랑크, 중프랑크, 동프랑크로 분열되는 배경이 된 두 조약은?",
-        options: ["베르됭 조약 - 메르센 조약", "보름스 협약 - 베스트팔렌 조약", "베르됭 조약 - 보름스 협약", "메르센 조약 - 베스트팔렌 조약", "클레르몽 공의회 - 베르됭 조약"],
-        correctIndex: 0,
-        explanation: "학습지 1-(4): 카롤루스 대제 사후 내분으로 베르됭 조약, 메르센 조약이 체결되어 분열되었습니다."
-      },
-      {
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        question: "6세기 비잔티움 제국의 유스티니아누스 황제 시기에 편찬된 법전과 건립된 대성당의 올바른 조합은?",
-        options: ["함무라비 법전 - 피사 대성당", "유스티니아누스 법전 - 성 소피아 대성당", "로마 대법전 - 샤르트르 대성당", "유스티니아누스 법전 - 성 베드로 대성당", "12표법 - 성 소피아 대성당"],
-        correctIndex: 1,
-        explanation: "학습지 2-(3): 유스티니아누스 시기에 『유스티니아누스 법전』 편찬 및 성 소피아 대성당(아야 소피아)이 건립되었습니다."
-      },
-      {
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        question: "중세 서유럽 봉건 사회에서 땅(봉토)을 매개로 주군과 봉신 간에 맺은 관계의 본질적 성격은?",
-        options: ["혈연에 기초한 씨족 관계", "서로 의무를 지켜야 하는 계약 관계", "국왕 중심의 중앙 집권 관계", "자유로운 신분 이동 관계", "상인 간의 영리 목적 조합"],
-        correctIndex: 1,
-        explanation: "학습지 1-(2): 주종제는 땅(봉토)을 매개로 한 주군과 봉신 간의 관계로, 서로 의무를 지켜야 하는 계약 관계였습니다."
-      },
-      {
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        question: "중세 장원 안에서 생활하던 농노에 대한 설명으로 학습지 내용과 일치하는 것은?",
-        options: ["언제든지 장원을 떠나 이사할 수 있었다.", "재산을 소유하거나 결혼을 할 수 없었다.", "영주에게 각종 시설의 사용료와 세금을 바치고 영주의 땅에서 농사를 지었다.", "도시의 길드에 가입하여 자치권을 행사했다.", "기사 계급으로 승급하여 봉토를 받을 수 있었다."],
-        correctIndex: 2,
-        explanation: "학습지 1-(3): 농노는 영주에게 사용료와 세금을 바치고 영주의 허락 없이 장원을 떠날 수 없었으나, 결혼과 약간의 재산 소유는 가능했습니다."
-      },
-      {
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        question: "12세기 이후 서유럽에서 유행하였으며, 뾰족한 탑과 화려한 색유리그림(스테인드글라스)이 특징인 건축 양식은?",
-        options: ["로마네스크 양식", "비잔티움 양식", "고딕 양식", "르네상스 양식", "바로크 양식"],
-        correctIndex: 2,
-        explanation: "학습지 3-(3): 12세기 이후 뾰족한 탑과 화려한 색유리그림(스테인드글라스)이 특징인 고딕 양식(대표: 샤르트르 대성당)이 유행하였습니다."
-      },
-      {
-        chasiId: "38",
-        chasiLabel: "38차시",
-        question: "1077년 성직자 임명권을 둘러싸고 교황 그레고리우스 7세에게 파문당한 신성 로마 제국 황제 하인리히 4세가 사죄한 사건은?",
-        options: ["카노사의 굴욕", "보름스 협약", "아비뇽 유수", "클레르몽 공의회", "교회의 대분열"],
-        correctIndex: 0,
-        explanation: "학습지 2-(1): 1077년 황제 하인리히 4세가 교황이 머무는 카노사성에 가서 사죄한 사건은 '카노사의 굴욕'입니다."
-      },
-      {
-        chasiId: "38",
-        chasiLabel: "38차시",
-        question: "1122년 교황만이 성직자 임명권을 가질 수 있다고 최종 결정하여 교황권 성장의 계기가 된 협약은?",
-        options: ["베르됭 조약", "메르센 조약", "보름스 협약", "베스트팔렌 조약", "낭트 칙령"],
-        correctIndex: 2,
-        explanation: "학습지 2-(2): 1122년 보름스 협약을 통해 교황만이 성직자 임명권을 가질 수 있다고 결정되었습니다."
-      },
-      {
-        chasiId: "38",
-        chasiLabel: "38차시",
-        question: "13세기 후반 프랑스 국왕 필리프 4세에 의해 교황청이 프랑스로 옮겨져 약 70년 동안 교황들이 머물렀던 사건은?",
-        options: ["수도원 운동", "카노사의 굴욕", "아비뇽 유수", "교회의 대분열", "30년 전쟁"],
-        correctIndex: 2,
-        explanation: "학습지 3-(1): 프랑스 국왕 필리프 4세가 교황청을 프랑스 아비뇽으로 옮겨 교황들이 지낸 사건은 '아비뇽 유수'입니다."
-      },
-      {
-        chasiId: "39",
-        chasiLabel: "39차시",
-        question: "11세기경 바그다드를 정복하고 아바스 왕조의 칼리프로부터 '술탄'의 칭호를 얻은 유목 민족은?",
-        options: ["셀주크 튀르크", "오스만 튀르크", "훈족", "몽골군", "게르만족"],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 셀주크 튀르크는 바그다드를 정복하고 칼리프로부터 술탄의 칭호를 얻었습니다."
-      },
-      {
-        chasiId: "39",
-        chasiLabel: "39차시",
-        question: "셀주크 튀르크가 예루살렘을 점령하자 교황 우르바누스 2세가 성지를 되찾자고 전쟁 참여를 호소한 회의는?",
-        options: ["보름스 회의", "클레르몽 공의회", "트렌토 공의회", "아비뇽 회의", "베르됭 회의"],
-        correctIndex: 1,
-        explanation: "학습지 2-(1): 교황 우르바누스 2세는 클레르몽 공의회에서 성지를 되찾자고 전쟁 참여를 호소하였습니다."
-      },
-      {
-        chasiId: "39",
-        chasiLabel: "39차시",
-        question: "십자군 전쟁이 서유럽 사회에 미친 영향으로 학습지 내용과 일치하지 않는 것은?",
-        options: ["성지 회복에 실패하였다.", "전쟁을 이끈 교황의 권위가 하락하였다.", "참전한 제후와 기사 세력이 약화되었다.", "상대적으로 왕권이 강화되었다.", "베네치아와 제노바 등 지중해 연안 도시들이 몰락하였다."],
-        correctIndex: 4,
-        explanation: "학습지 3-(3): 십자군 전쟁 이후 베네치아, 제노바, 피사 등 지중해 연안 도시들은 번성하였습니다."
-      },
-      {
-        chasiId: "40",
-        chasiLabel: "40차시",
-        question: "14세기 흑사병 유행으로 인구가 급감하자 서유럽 장원에 나타난 경제적 결과는?",
-        options: ["노동력 부족으로 영주들이 농노(농민)의 처우를 개선해 주었다.", "농민의 신분이 노예로 강등되었다.", "모든 장원이 영주 중심의 중앙 집권으로 통일되었다.", "화폐 경제가 사라지고 물물 교환만 이루어졌다.", "농민들이 앞다투어 기사 계급으로 진출하였다."],
-        correctIndex: 0,
-        explanation: "학습지 1-(1): 흑사병으로 노동력이 부족해지자 영주들이 농노(농민)의 처우를 개선해 주었습니다."
-      },
-      {
-        chasiId: "40",
-        chasiLabel: "40차시",
-        question: "중세 도시에서 상인과 수공업자들이 결성한 동업 조합의 명칭은?",
-        options: ["길드", "장원", "기사단", "콜베르", "동인도 회사"],
-        correctIndex: 0,
-        explanation: "학습지 2-(2): 도시의 상인과 수공업자들은 동업 조합인 '길드'를 결성하였습니다."
-      },
-      {
-        chasiId: "41",
-        chasiLabel: "41차시",
-        question: "고대 그리스·로마 문화를 되살려 인간의 개성과 능력을 중시한 이탈리아 르네상스의 근본정신은?",
-        options: ["스콜라 철학", "인문주의", "왕권신수설", "계몽사상", "예정설"],
-        correctIndex: 1,
-        explanation: "학습지 1-(1): 이탈리아 르네상스의 근본정신은 인간의 개성과 능력을 중시하는 '인문주의'입니다."
-      },
-      {
-        chasiId: "41",
-        chasiLabel: "41차시",
-        question: "16세기 이후 확산된 알프스 이북 르네상스의 가장 두드러진 특징은?",
-        options: ["인체의 관능미와 미술 건축에만 집중하였다.", "현실 사회와 교회의 문제점을 비판하는 경향이 강했다.", "로마 교황청의 권위를 더욱 강화하고자 하였다.", "고대 로마 법전을 부활시키는 데 목적이 있었다.", "농노의 장원 복귀를 정당화하였다."],
-        correctIndex: 1,
-        explanation: "학습지 2-(2): 알프스 이북의 르네상스는 현실 사회와 교회의 문제점을 비판하는 경향이 강했습니다."
-      },
-      {
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        question: "송 태조 조광윤이 절도사의 권한을 약화시키고 황제권을 강화하기 위해 실시한 정책은?",
-        options: ["문치주의 정책", "군국주의 정책", "재상 중심 정책", "봉건 분봉 정책", "쇄국 정책"],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 송 태조는 문인을 우대하는 문치주의 정책을 실시하였습니다."
-      },
-      {
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        question: "송나라 시기 주요 무역 항구에 설치되어 해상 무역과 세금 징수를 담당했던 관청은?",
-        options: ["시박사", "동인도 회사", "공행", "역참", "길드"],
-        correctIndex: 0,
-        explanation: "학습지 4-(1): 주요 항구에 세금과 무역을 담당하는 '시박사'를 설치하였습니다."
-      },
-      {
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        question: "몽골 제국 원나라에서 관리나 사신에게 숙식과 말을 제공하기 위해 전국에 정비한 교통 제도는?",
-        options: ["역참", "이갑제", "장원제", "군현제", "주현제"],
-        correctIndex: 0,
-        explanation: "학습지 4-(1): 도로망을 정비하고 관리나 사신에게 숙식과 말을 제공하는 '역참'을 설치하였습니다."
-      },
-      {
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        question: "원나라의 신분 제도인 몽골 제일주의에서 재정과 행정 업무를 주로 담당하며 우대받았던 계층은?",
-        options: ["색목인", "한인", "남인", "신사", "사대부"],
-        correctIndex: 0,
-        explanation: "학습지 자료 ①: 몽골인은 주요 관직을 독점하고, 색목인은 재정·행정을 담당하며 우대받았습니다."
-      },
-      {
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        question: "청나라가 소수의 만주족으로 다수의 한족을 통치하기 위해 실시한 '회유책'에 해당하는 것은?",
-        options: ["중요한 관직에 만주족과 한족 함께 등용(만한병용제)", "만주족의 풍습인 변발과 호복 강요", "청 왕조를 비판하는 서적 금지(문자옥)", "과거제를 전면 폐지하고 만주족만 관리 선발", "한족의 유교 경전 연구를 전면 금지"],
-        correctIndex: 0,
-        explanation: "학습지 2-(2): 청은 회유책으로 중요한 관직에 만주족과 한족 함께 등용(만한병용제), 유학 교육 장려, 과거제를 실시했습니다."
-      },
-      {
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        question: "명·청 시기 대규모로 유입된 은(銀)으로 인해 추진된 세제 개혁의 연결로 옳은 것은?",
-        options: ["명: 일조편법 (지세와 정세를 은으로 납부) - 청: 지정은제 (정세를 지세에 포함)", "명: 지정은제 - 청: 대동법", "명: 균전제 - 청: 일조편법", "명: 양세법 - 청: 조용조", "명: 호포제 - 청: 지정은제"],
-        correctIndex: 0,
-        explanation: "학습지 손글씨 필기: 명나라는 일조편법(지세+정세 은납), 청나라는 지정은제(지세만 은납)를 실시하였습니다."
-      },
-      {
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        question: "명나라 영락제 때 대규모 함대를 이끌고 동남아시아, 인도, 아프리카까지 진출하여 국력을 과시한 인물은?",
-        options: ["정화", "주원장", "마테오 리치", "누르하치", "홍타이지"],
-        correctIndex: 0,
-        explanation: "학습지 1-(3): 영락제 시기 정화의 함대를 해외에 파견하였습니다."
-      },
-      {
-        chasiId: "49",
-        chasiLabel: "49차시",
-        question: "무굴 제국의 아크바르 황제가 힌두교도와 비이슬람교도들을 포용하기 위해 실시한 대표적인 정책은?",
-        options: ["인두세(지즈야) 폐지", "힌두교 사원 전면 파괴", "이슬람교로의 강제 개종", "페르시아어 사용 금지", "지즈야 대폭 인상"],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 아크바르 황제는 비이슬람교도에게 거두던 인두세(지즈야)를 폐지하고 관직을 주었습니다."
-      },
-      {
-        chasiId: "49",
-        chasiLabel: "49차시",
-        question: "무굴 제국의 아우랑제브 황제에 대한 설명으로 학습지 내용과 일치하는 것은?",
-        options: ["인도 남부를 정복하여 최대 영토를 차지하였다.", "인두세(지즈야)를 영구 폐지하였다.", "델리를 정복하고 처음으로 무굴 제국을 세웠다.", "힌두교도에게만 모든 고위 관직을 위임하였다.", "대륙 봉쇄령을 내려 유럽 상인을 축출하였다."],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 아우랑제브 황제는 인도 남부를 정복하여 최대 영토를 차지했으나 지즈야를 부활시켰습니다."
-      },
-      {
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        question: "오스만 제국에서 비이슬람교도에게 세금을 거두는 대신 독자적인 자치를 허용한 종교 공동체 제도는?",
-        options: ["밀레트", "예니체리", "술탄", "길드", "이갑제"],
-        correctIndex: 0,
-        explanation: "학습지 2-(1): 오스만 제국은 세금을 내면 독자적인 종교 공동체인 밀레트의 자치를 인정했습니다."
-      },
-      {
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        question: "오스만 제국의 쉴레이만 1세 시기에 있었던 역사적 사실로 알맞은 것은?",
-        options: ["헝가리를 정복하고 오스트리아의 수도 빈을 공격하였다.", "비잔티움 제국을 정복하고 이스탄불로 천도하였다.", "인두세(지즈야)를 전면 폐지하였다.", "예니체리를 해산하고 민병대를 창설하였다.", "대륙 봉쇄령을 발표하여 영국을 고립시켰다."],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 쉴레이만 1세는 헝가리 정복, 오스트리아의 수도 빈 공격, 지중해 장악을 이루었습니다."
-      },
-      {
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        question: "에스파냐에 의해 파괴된 아메리카의 고대 문명과 정복자의 연결이 바른 것은?",
-        options: ["아스테카 문명 - 코르테스", "잉카 문명 - 콜럼버스", "아스테카 문명 - 바스쿠 다가마", "잉카 문명 - 마젤란", "마야 문명 - 루이 14세"],
-        correctIndex: 0,
-        explanation: "학습지 3-(1): 아스테카 문명은 코르테스에게, 잉카 문명은 피사로에게 정복되었습니다."
-      },
-      {
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        question: "인간 구원은 신에 의해 이미 정해져 있다는 '예정설'을 주장하여 상공업자들의 큰 환영을 받은 종교 개혁가는?",
-        options: ["마르틴 루터", "칼뱅", "헨리 8세", "로욜라", "콜베르"],
-        correctIndex: 1,
-        explanation: "학습지 1-(1): 칼뱅은 예정설을 주장하고 근면과 절약을 강조하여 상공업자들의 환영을 받았습니다."
-      },
-      {
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        question: "프랑스의 루이 14세가 주장한 '왕의 권리는 신에게 받은 절대적인 것'이라는 정치 사상은?",
-        options: ["사회 계약설", "왕권신수설", "인문주의", "계몽사상", "스콜라 철학"],
-        correctIndex: 1,
-        explanation: "학습지 3-(2): 프랑스의 루이 14세는 왕권신수설을 주장하였습니다."
-      },
-      {
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        question: "영국의 명예혁명(1688) 결과 의회가 국왕에게 승인을 받아 입헌 군주제의 기초를 마련한 문서는?",
-        options: ["권리 청원", "권리장전", "95개조 반박문", "대헌장", "인권 선언"],
-        correctIndex: 1,
-        explanation: "학습지 2-(2): 의회가 제출한 권리장전을 국왕이 받아들임으로써 입헌 군주제의 기초를 마련했습니다."
-      },
-      {
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        question: "미국 혁명의 발단이 된 1773년 보스턴 차 사건의 직접적인 계기는?",
-        options: ["영국 정부의 차 세금 부과 및 영국 동인도 회사에 차 독점 판매 허용", "영국의 인클로저 운동", "노예 무역의 전면 금지", "프랑스군의 보스턴 침공", "영국의 입헌 군주제 수립"],
-        correctIndex: 0,
-        explanation: "학습지 3-(2): 영국 정부가 차 등에 세금을 부과하고 영국 동인도 회사에 차 독점 판매를 허용하자 일어났습니다."
-      },
-      {
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        question: "프랑스 혁명 당시 국민 공회의 로베스피에르가 반대파를 가혹하게 처형하며 실시한 정치는?",
-        options: ["공포 정치", "문치주의 정책", "철혈 정책", "중상주의 정책", "관용 정책"],
-        correctIndex: 0,
-        explanation: "학습지 1-(3): 국민 공회의 로베스피에르는 공포 정치를 실시하였습니다."
-      },
-      {
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        question: "나폴레옹이 영국을 고립시킬 목적으로 유럽 대륙과 영국 간 무역을 금지한 명령은?",
-        options: ["대륙 봉쇄령", "항해법", "먼로 선언", "토리노 조약", "베스트팔렌 조약"],
-        correctIndex: 0,
-        explanation: "학습지 2-(2): 나폴레옹은 영국을 고립시킬 목적으로 대륙 봉쇄령을 선포했습니다."
-      },
-      {
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        question: "19세기 독일 통일을 위해 프로이센의 재상 비스마르크가 추진한 정책은?",
-        options: ["철혈 정책", "중상주의 정책", "문치주의 정책", "공포 정치", "사회 계약설"],
-        correctIndex: 0,
-        explanation: "학습지 3-(2): 비스마르크는 군사력을 강화하는 '철혈 정책'을 추진했습니다."
-      },
-      {
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        question: "미국의 남북 전쟁(1861~1865) 중 북부의 승기를 잡게 한 링컨 대통령의 선언은?",
-        options: ["노예 해방 선언", "독립 선언", "먼로 선언", "권리 선언", "인권 선언"],
-        correctIndex: 0,
-        explanation: "학습지 4-(2): 링컨 대통령은 1863년 노예 해방 선언을 발표하였습니다."
-      },
-      {
-        chasiId: "62",
-        chasiLabel: "62차시",
-        question: "베네수엘라, 콜롬비아, 페루, 볼리비아 등의 독립 투쟁을 이끈 라틴 아메리카의 대표적인 지도자는?",
-        options: ["볼리바르", "산마르틴", "이달고", "투생 루베르튀르", "메테르니히"],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 볼리바르는 콜롬비아, 베네수엘라, 페루, 볼리비아의 독립을 주도했습니다."
-      },
-      {
-        chasiId: "62",
-        chasiLabel: "62차시",
-        question: "1823년 미국 대통령 먼로가 발표한 '유럽이 아메리카 대륙에 간섭하는 것을 허용하지 않겠다'는 선언은?",
-        options: ["먼로 선언", "대륙 봉쇄령", "독립 선언", "노예 해방 선언", "인민헌장"],
-        correctIndex: 0,
-        explanation: "학습지 1-(3): 미국의 먼로 선언 발표로 유럽의 아메리카 대륙 간섭을 배격했습니다."
-      }
-    ];
+    let currentTab = 'summary';
 
-    /* ========================================================
-       4. 심화 5지선다 문제 풀 (자료 탐구 및 사료 일치)
-       ======================================================== */
-    const ADVANCED_QUIZ_POOL = [
-      {
-        chasiId: "34-35",
-        chasiLabel: "34~35차시 [심화]",
-        material: "학습지 자료 ①: '프랑크 왕국의 전성기를 이끈 카롤루스 대제는 이탈리아에서 교황을 위협하는 세력을 없애고 크리스트교를 널리 전하고자 힘쓴 점을 인정받아 로마 교황 레오 3세에게 서로마 황제의 관을 받았다.'",
-        question: "위 자료에 나타난 카롤루스 대제의 대관이 유럽 역사에 지니는 가장 큰 의미는?",
-        options: [
-          "비잔티움 제국과 이슬람 세력이 동맹을 맺게 되었다.",
-          "게르만 문화, 로마 문화, 크리스트교가 어우러진 서유럽 문화의 기틀이 마련되었다.",
-          "로마 가톨릭교회가 그리스 정교회에 완전히 흡수 통합되었다.",
-          "프랑크 왕국이 즉시 서프랑크, 중프랑크, 동프랑크로 3분할되었다.",
-          "교황이 성직자 임명권을 상실하고 황제의 지배를 받게 되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 1-(3): 카롤루스 대제는 게르만 문화, 로마 문화, 크리스트교가 어우러진 서유럽 문화의 기틀을 마련했습니다."
-      },
-      {
-        chasiId: "36-37",
-        chasiLabel: "36~37차시 [심화]",
-        material: "학습지 자료 ① (봉건 사회의 구조): '주군과 봉신의 주종 관계는 서로의 의무를 성실히 지킬 것을 약속한 계약 관계로, 어느 한쪽이 의무를 지키지 않으면 계약은 깨질 수 있었다.'",
-        question: "위 자료를 근거로 중세 서유럽 주종제의 성격을 추론한 것으로 가장 적절한 것은?",
-        options: [
-          "국왕이 절대적인 권한을 행사하는 중앙 집권적 군신 관계였다.",
-          "영주와 농노 간에 맺어진 엄격한 세습적 신분 계약이었다.",
-          "주군(토지 수여·보호)과 봉신(충성·군사 봉사)이 상호 의무를 지켜야 하는 계약 관계였다.",
-          "도시 상인들이 자치권을 획득하기 위해 국왕에게 돈을 바친 대가였다.",
-          "교황의 승인이 있어야만 유지되는 일방적인 종교 서약이었다."
-        ],
-        correctIndex: 2,
-        explanation: "학습지 자료 ①: 주군과 봉신의 주종 관계는 서로 의무를 성실히 지킬 것을 약속한 계약 관계였습니다."
-      },
-      {
-        chasiId: "38",
-        chasiLabel: "38차시 [심화]",
-        material: "학습지 만화 사료: \n- 황제 하인리히 4세: '황제인 나도 성직자를 임명할 권리가 있소.'\n- 교황 그레고리우스 7세: '교황만이 성직자를 임명할 수 있다고 하였건만! 황제 하인리히 4세를 파문한다.'\n- 황제: '이곳 카노사에서 눈을 맞으며 3일간 참회하였습니다. 용서해 주십시오.'",
-        question: "위 사건(카노사의 굴욕) 이후 1122년 보름스 협약까지 이어진 갈등의 핵심 쟁점은 무엇이었는가?",
-        options: [
-          "교황청을 프랑스 아비뇽으로 옮기는 문제",
-          "십자군 전쟁의 출병 비용을 누가 분담할 것인가의 문제",
-          "성직자 임명권을 둘러싸고 교황과 황제 중 누가 가질 것인가의 대립",
-          "클뤼니 수도원의 세금을 감면해 줄 것인가의 문제",
-          "이슬람 세력과의 평화 조약 체결 권한 문제"
-        ],
-        correctIndex: 2,
-        explanation: "학습지 2-(1), (2): 성직자 임명권을 둘러싼 교황과 황제의 대립이었으며 보름스 협약에서 '교황만이 성직자 임명권을 가질 수 있다'고 결정되었습니다."
-      },
-      {
-        chasiId: "39",
-        chasiLabel: "39차시 [심화]",
-        material: "학습지 자료 ②: '십자군 전쟁이 끝난 후 베네치아, 제노바 등 지중해 연안의 도시들이 번성하였다. 물의 도시라고도 불리는 베네치아는 바다와 가까워 무역에 유리하였으며, 13세기에는 유럽에서 가장 부유한 도시 중 하나였다.'",
-        question: "십자군 전쟁이 서유럽 경제와 정치에 미친 복합적인 영향으로 옳은 설명만을 고른 것은?",
-        options: [
-          "성지 회복에 성공하여 교황의 권위가 전 유럽에서 절대화되었다.",
-          "전쟁을 이끈 교황의 권위 하락, 제후와 기사 세력 약화, 상대적으로 왕권이 강화되었다.",
-          "지중해 무역이 쇠퇴하여 유럽의 상업 중심지가 발트해로만 이동했다.",
-          "셀주크 튀르크가 십자군을 완전히 제압하여 서유럽 전역을 통일했다.",
-          "중국의 제지술 유입이 금지되어 유럽 문화가 정체되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 2-(4): 교황 권위 하락, 제후·기사 세력 약화, 상대적 왕권 강화 및 지중해 연안 도시들의 번성이 나타났습니다."
-      },
-      {
-        chasiId: "40",
-        chasiLabel: "40차시 [심화]",
-        material: "학습지 자료 ①: '14세기 유럽에서는 페스트균이 일으키는 흑사병이 유행하여 유럽 인구의 약 3분의 1이 사망하였다. 인구가 줄어 노동력이 부족해지자 영주들이 농민의 처우를 개선해 주면서 그들의 지위가 높아졌다.'",
-        question: "위 자료의 현상이 발생한 이후 나타난 서유럽 사회의 변화로 옳지 않은 것은?",
-        options: [
-          "줄어든 수입을 보충하려는 영주들의 억압에 맞서 자크리의 난, 와트 타일러의 난이 일어났다.",
-          "화폐 경제가 발달하면서 영주가 농노에게 돈을 받고 신분을 해방시켜 주었다.",
-          "장원이 해체되고 중세 봉건 사회가 동요하였다.",
-          "농노의 신분 구속이 더욱 강화되어 장원제가 이전보다 굳건해졌다.",
-          "도시 상인과 수공업자들은 길드를 결성하고 영주로부터 자치권을 획득해 갔다."
-        ],
-        correctIndex: 3,
-        explanation: "학습지 1-(1), (2): 농노 처우 개선과 신분 해방으로 장원제가 해체되었으므로 구속이 강화되었다는 설명은 틀렸습니다."
-      },
-      {
-        chasiId: "41",
-        chasiLabel: "41차시 [심화]",
-        material: "학습지 자료 ② (에라스뮈스 『우신예찬』): '요즘 교황은 힘들고 어려운 일은 베드로와 바울에게 떠넘기고 호화로운 의식과 즐거운 일만 찾는다. 교황은 바로 나, 우신(어리석음의 신) 덕분에 편안하게 살아가고 있다.'",
-        question: "위 사료가 보여주는 16세기 '알프스 이북의 르네상스'의 특징으로 가장 알맞은 것은?",
-        options: [
-          "인체의 사실적인 아름다움과 원근법을 완성하는 데 주력하였다.",
-          "현실 사회와 교회의 문제점을 비판하는 경향이 강하였다.",
-          "로마 교황청의 권위를 더욱 높이고자 하였다.",
-          "고대 그리스의 영웅 서사시를 모방하여 기사도 문학을 부활시켰다.",
-          "지동설을 전면 부정하고 천동설을 지키고자 하였다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 2-(2): 16세기 이후 확산된 알프스 이북의 르네상스는 현실 사회와 교회의 문제점을 비판하는 경향이 강했습니다."
-      },
-      {
-        chasiId: "42-43",
-        chasiLabel: "42~43차시 [심화]",
-        material: "학습지 자료 ① (전시 제도 도입): '태조는 과거제의 운영 방식을 고쳐 전시 제도를 시행하였다. 지방에서 열리는 1차 시험에 합격한 사람은 수도에 올라와 2차 시험을 보고, 여기서 합격하면 황제가 직접 시험관으로 참여한 3차 시험(전시)을 치른 후 관리로 뽑혔다.'",
-        question: "송 태조가 위 자료와 같이 '전시 제도'를 도입한 가장 주된 목적과 결과로 옳은 것은?",
-        options: [
-          "무인 세력의 지위를 높여 북방 민족을 군사적으로 정복하기 위함이었다.",
-          "황제권을 강화하고 사대부 계층을 형성하였다.",
-          "지방 절도사들에게 군사권을 완전히 위임하기 위함이었다.",
-          "과거 시험을 폐지하고 음서 제도로만 귀족을 선발하기 위함이었다.",
-          "농민 반란을 진압하기 위해 농민들에게 직접 무기를 지급하기 위함이었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 1-(2): 태조의 문치주의와 전시 제도를 통해 황제권이 강화되고 사대부 계층이 형성되었습니다."
-      },
-      {
-        chasiId: "44-45",
-        chasiLabel: "44~45차시 [심화]",
-        material: "학습지 자료 ② (역참제와 패자): '몽골 제국은 넓은 영토를 원활하게 다스리고자 도로망을 정비하였다. 육로에는 일정한 거리마다 역참을 두어 사신과 상인들이 안전하게 여행할 수 있도록 하였다. 몽골 황제의 문장이 새겨진 패자를 가지고 있으면 말과 수레 등을 이용할 수 있었다.'",
-        question: "위 자료에 나타난 제도가 유라시아 세계에 가져온 영향으로 가장 알맞은 것은?",
-        options: [
-          "초원길, 비단길, 바닷길을 연결하는 교역권이 형성되어 동서 문화 교류가 활발해졌다.",
-          "동서 교역이 전면 중단되고 원나라 내부의 상업만 번성하게 되었다.",
-          "이슬람 상인들의 이동이 통제되어 지중해와 아시아의 교역이 단절되었다.",
-          "유럽과의 교류가 차단되어 마르코 폴로의 중국 방문이 무산되었다.",
-          "중국의 인쇄술과 나침반이 서양으로 전파되는 것이 금지되었다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 4-(2): 역참제와 패자를 통해 초원길, 비단길, 바닷길이 연결되며 동서 문화 교류가 크게 발달했습니다."
-      },
-      {
-        chasiId: "46-47",
-        chasiLabel: "46~47차시 [심화]",
-        material: "학습지 자료 ② (곤여만국전도): '명대부터 서양 상인과 함께 유럽의 선교사들이 중국에 방문하였다. 이탈리아의 선교사 마테오 리치는 명에 머무르며 세계 지도인 『곤여만국전도』를 만들었다. 이 지도는 중국이 세계의 중심이라고 믿었던 동아시아 여러 나라의 세계관이 변화하는 데 큰 영향을 주었다.'",
-        question: "위 자료의 역사적 사실과 관련하여 당시 명·청대 문물 교류에 대한 설명으로 옳은 것은?",
-        options: [
-          "중국인들은 서양 문물을 전면 배척하고 모든 선교사를 즉시 추방하였다.",
-          "서양 선교사들이 크리스트교와 서양의 다양한 학문·기술을 중국에 소개하였다.",
-          "청나라는 서양과의 무역을 장려하기 위해 전국의 모든 항구를 개방하였다.",
-          "『곤여만국전도』의 영향으로 중국 중심의 천하관이 더욱 완고해졌다.",
-          "유럽으로부터 막대한 양의 금이 중국으로 유입되어 은의 유통이 중단되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 3-(5): 선교사들이 크리스트교와 서양의 다양한 학문·기술을 중국에 소개하였습니다."
-      },
-      {
-        chasiId: "49",
-        chasiLabel: "49차시 [심화]",
-        material: "학습지 사료: '아크바르 황제는 힌두교의 브라만, 자이나교와 조로아스터교의 승려, 크리스트교 신부 등 종교인들을 초대하여 토론을 벌였다. 그는 모든 종교인을 동등하게 대하고 그들의 종교를 존중하였다.'",
-        question: "위 자료에 나타난 아크바르 황제의 종교 정책과 그 구체적 조치로 옳은 것은?",
-        options: [
-          "비이슬람교도에게 거두던 인두세(지즈야)를 폐지하고 힌두교도에게 관직을 주었다.",
-          "힌두교 사원을 파괴하고 이슬람 율법만을 강요하였다.",
-          "피지배층에게 변발과 호복을 강제하였다.",
-          "무굴 제국 내의 모든 힌두교도를 국외로 추방하였다.",
-          "상비군을 해산하고 민병대 중심의 분권제를 확립하였다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 아크바르 황제는 비이슬람교도에게 거두던 인두세(지즈야)를 폐지하고 힌두교도에게 관직을 주었습니다."
-      },
-      {
-        chasiId: "50-51",
-        chasiLabel: "50~51차시 [심화]",
-        material: "학습지 자료 ①: '오스만 제국은 넓은 영토를 효율적으로 다스리고자 정복지 주민에게 관용 정책을 실시하였다. 술탄의 정예군인 예니체리는 크리스트교도였지만 이슬람교로 개종하고 술탄에게 충성을 맹세한 대신 세금을 면제받는 등 특별한 대우를 받았다.'",
-        question: "오스만 제국이 다민족·다종교 대제국을 안정적으로 유지할 수 있었던 비결로 가장 알맞은 것은?",
-        options: [
-          "모든 정복지 주민의 재산을 몰수하고 노예로 삼았다.",
-          "밀레트 구성을 통해 종교 공동체의 자치를 인정하고 예니체리를 양성하였다.",
-          "크리스트교 신앙을 전면 금지하고 성 소피아 대성당을 철거했다.",
-          "유럽과의 무역을 전면 차단하고 쇄국 정책을 유지했다.",
-          "과거제를 통해 한족 유학자들만을 관리로 선발했다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 2-(1): 밀레트 자치 인정과 예니체리 정예병 양성을 통해 제국을 효율적으로 다스렸습니다."
-      },
-      {
-        chasiId: "52-53",
-        chasiLabel: "52~53차시 [심화]",
-        material: "학습지 자료 ②: '신항로 개척 이후 멕시코고원의 아스테카 제국은 코르테스가 이끈 병사들에게, 안데스고원의 잉카 제국은 피사로와 그의 병사들에게 정복되었다. 원주민은 대농장에서 노동력을 착취당하고 유럽에서 전파된 전염병(천연두, 홍역 등)으로 인구가 감소하였다.'",
-        question: "위 자료의 상황 이후 전개된 대서양 삼각 무역의 구조로 옳은 것은?",
-        options: [
-          "아메리카 원주민의 인구 감소를 메우기 위해 아프리카 원주민을 노예로 동원하였다.",
-          "유럽 각국은 아메리카 문명을 존중하여 총독부를 원주민에게 이양하였다.",
-          "무역의 중심지가 대서양에서 다시 지중해로 이동하였다.",
-          "유럽으로 금과 은이 유입되지 않아 유럽의 물가가 급격히 폭락하였다.",
-          "아프리카의 부족 간 갈등이 종식되고 평화로운 자급 경제가 확립되었다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 3-(2): 아메리카 원주민 인구 감소로 아프리카 원주민을 노예로 동원하는 노예 무역이 일어났습니다."
-      },
-      {
-        chasiId: "54-55",
-        chasiLabel: "54~55차시 [심화]",
-        material: "학습지 자료 ①: '프랑스의 루이 14세는 왕의 권리는 신에게 받은 절대적인 것이므로 왕에게 절대복종해야 한다는 왕권신수설을 주장하였다. 루이 14세 때 왕권이 절정에 이르렀으며, 그는 자신을 고대 로마의 태양신인 아폴론에 비유하면서 왕권을 신성화하였다.'",
-        question: "위와 같은 절대군주 국가에서 국력을 키우기 위해 실시한 경제 정책은?",
-        options: [
-          "상비군을 해산하고 민병대 위주로 국방을 개편하였다.",
-          "수입을 전면 자유화하고 외국산 사치품 수입을 장려하였다.",
-          "수입은 제한하고 수출은 늘려 금과 은을 확보하는 중상주의 정책을 실시하였다.",
-          "관료제를 폐지하고 지방 봉건 영주들에게 징세권을 위임하였다.",
-          "종교의 자유를 완전히 인정하여 가톨릭교회를 국교에서 제외하였다."
-        ],
-        correctIndex: 2,
-        explanation: "학습지 2-(2): 수입은 제한하고 수출은 늘려 금과 은을 확보하는 중상주의 정책을 실시했습니다."
-      },
-      {
-        chasiId: "56-57",
-        chasiLabel: "56~57차시 [심화]",
-        material: "학습지 자료 ① (권리장전): \n- 제1조: 국왕은 의회의 동의 없이 법의 효력을 정지하거나 법의 집행을 막을 수 없다.\n- 제4조: 국왕이 의회의 승인 없이 세금을 거두는 것은 위법이다.\n- 제6조: 의회의 동의 없이 왕국 내에서 군대를 모으거나 유지하는 것은 위법이다.",
-        question: "위 문서(권리장전)가 승인됨으로써 영국 정치 체제에 나타난 변화는?",
-        options: [
-          "국왕의 전제 정치가 더욱 강화되었다.",
-          "의회를 중심으로 한 입헌 군주제의 기초가 마련되었다.",
-          "국왕이 폐지되고 크롬웰의 공화정이 시작되었다.",
-          "미국과 프랑스에 대한 군사적 개입이 의무화되었다.",
-          "신분제가 완전히 폐지되고 보통 선거가 도입되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 2-(3): 의회가 제출한 권리장전을 국왕이 받아들임으로써 입헌 군주제의 기초가 마련되었습니다."
-      },
-      {
-        chasiId: "58-59",
-        chasiLabel: "58~59차시 [심화]",
-        material: "학습지 자료 ① (구제도의 모순): '제1신분인 성직자와 제2신분인 귀족은 전체 인구의 2% 정도밖에 되지 않지만 높은 관직과 많은 토지를 차지하였다. 국민의 대다수를 차지하고 있던 제3신분인 평민은 무거운 세금에 시달리면서도 정치에 참여하지 못했다.'",
-        question: "위 자료가 나타내는 프랑스 혁명의 근본적인 배경으로 옳은 것은?",
-        options: [
-          "인구의 대다수인 제3신분이 과중한 세금을 부담하면서도 정치적 권리를 얻지 못했다.",
-          "성직자와 귀족이 혁명을 주도하여 공화정을 수립하려 했다.",
-          "나폴레옹이 황제에 즉위하여 전 유럽을 공격했기 때문이다.",
-          "영국이 프랑스에 대륙 봉쇄령을 선포했기 때문이다.",
-          "프랑스 국왕이 바스티유 감옥을 습격하도록 지시했기 때문이다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 1-(1): 구제도의 모순으로 제3신분은 세금만 내고 정치적 권리를 얻지 못했습니다."
-      },
-      {
-        chasiId: "60-61",
-        chasiLabel: "60~61차시 [심화]",
-        material: "학습지 자료 ② (비스마르크): '프로이센의 재상 비스마르크는 독일의 통일은 협상이 아니라 무력(무기와 병력)으로만 달성할 수 있다고 선언하였다. 이러한 비스마르크의 정책을 철혈 정책이라고 한다.'",
-        question: "위 자료에 나타난 비스마르크의 철혈 정책이 가져온 역사적 결과는?",
-        options: [
-          "오스트리아와 프랑스를 격파하고 독일 제국 성립을 선포하였다.",
-          "빈 체제를 지지하며 독일 통일을 무기한 연기하였다.",
-          "미국의 남북 전쟁에 개입하여 북부를 지원하였다.",
-          "이탈리아 가리발디의 의용대를 공격하여 해산시켰다.",
-          "프랑스 혁명을 지지하며 입헌 군주제를 폐지하였다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 3-(2): 비스마르크는 철혈 정책으로 오스트리아와 프랑스를 격파하고 독일 제국을 수립했습니다."
-      },
-      {
-        chasiId: "62",
-        chasiLabel: "62차시 [심화]",
-        material: "학습지 자료 ① (볼리바르): '라틴 아메리카의 독립운동은 이곳으로 이주한 에스파냐인의 후손인 크리오요가 이끌었다. 그중 볼리바르는 베네수엘라, 콜롬비아, 에콰도르를 합한 콜롬비아 공화국을 수립하였으며, 페루를 해방하고 볼리비아 공화국을 수립하였다.'",
-        question: "위 자료에 나타난 볼리바르의 활약과 라틴 아메리카 독립에 대한 설명으로 옳은 것은?",
-        options: [
-          "에스파냐로부터 여러 나라를 독립시키며 라틴 아메리카 독립 투쟁을 이끌었다.",
-          "미국의 먼로 선언을 정면으로 거부하고 영국과 전쟁을 벌였다.",
-          "프랑스 나폴레옹 황제의 명령을 받아 식민지를 통치하였다.",
-          "아이티 흑인 노예들의 반란을 진압하여 식민지 질서를 유지하였다.",
-          "라틴 아메리카 전역에 유럽식 전제 왕정을 복원하였다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 볼리바르는 베네수엘라, 콜롬비아, 페루, 볼리비아 등의 독립 투쟁을 이끈 핵심 지도자입니다."
-      },
-      {
-        chasiId: "40",
-        chasiLabel: "40차시 [심화]",
-        material: "학습지 본문 3-(2): '백년 전쟁: 14세기 중반 영국과 프랑스에서 왕위 계승 문제 발생 → 프랑스가 승리하여 중앙 집권 국가로 성장하는 발판 마련 / 장미 전쟁: 영국의 왕위 계승 문제 발생 → 전쟁에 참여한 많은 봉건 영주의 몰락 → 왕권 강화, 중앙 집권 국가의 모습을 갖추어 감'",
-        question: "위 자료를 바탕으로 백년 전쟁과 장미 전쟁이 서유럽 정치에 가져온 공통적인 결과로 가장 적절한 것은?",
-        options: [
-          "봉건 영주 세력이 강화되어 지방 분권 체제가 더욱 확립되었다.",
-          "전쟁을 거치며 왕권이 강화되고 중앙 집권 국가로 성장하는 발판이 마련되었다.",
-          "교황청이 로마에서 아비뇽으로 다시 이전되었다.",
-          "동업 조합인 길드가 해체되고 장원 농노의 수가 대폭 증가하였다.",
-          "신성 로마 제국 황제가 영국과 프랑스를 동시에 통합 지배하게 되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 3-(2): 백년 전쟁과 장미 전쟁을 거치며 영주 세력 몰락, 왕권 강화, 중앙 집권 국가 성장의 발판이 마련되었습니다."
-      },
-      {
-        chasiId: "44-45",
-        chasiLabel: "44~45차시 [심화]",
-        material: "학습지 본문 5-(2): '외국 문물 유입: 이슬람교·크리스트교·티베트 불교 등의 종교 전래, 이슬람의 역법·천문학이 전해져 원의 곽수경이 『수시력』을 만듦 / 중국 문물 전파: 화약 무기, 나침반, 인쇄술 등이 서양에 전해짐'",
-        question: "위 자료를 통해 알 수 있는 몽골 제국 시기 동서 문화 교류의 양상으로 가장 적절한 것은?",
-        options: [
-          "원나라는 서역의 종교와 학문 유입을 철저히 금지하였다.",
-          "이슬람의 역법과 천문학이 전해져 새로운 달력인 『수시력』이 제작되는 등 동서 문물이 상호 교류되었다.",
-          "중국의 화약 무기와 나침반은 서양으로 전파되지 않고 동아시아에만 머물렀다.",
-          "곽수경은 서양의 활판 인쇄술을 모방하여 『수시력』을 간행하였다.",
-          "크리스트교와 이슬람교 간의 종교 전쟁이 발생하여 비단길이 영구 폐쇄되었다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 5-(2): 이슬람의 역법과 천문학이 전해져 곽수경이 『수시력』을 만들었으며 중국 문물도 서양으로 활발히 전파되었습니다."
-      },
-      {
-        chasiId: "46-47",
-        chasiLabel: "46~47차시 [심화]",
-        material: "학습지 본문 1-(2): '홍무제의 정책: ① 황제권 강화: 재상제 폐지, 6부 직접 통치, 토지·호적 대장(이갑제, 어린도책, 부역황책) 작성 ② 한족 전통 회복: 몽골 풍습 금지, 유교 이념 부활(육유 반포, 과거제 정비)'",
-        question: "명 태조 홍무제가 추진한 정책의 핵심 의도와 조치로 옳은 것은?",
-        options: [
-          "재상을 두어 황제권을 견제하고 신하 중심의 정치를 구현하려 하였다.",
-          "재상제를 폐지하고 6부를 직접 통치하여 황제권을 극대화하고 한족의 전통을 회복하려 하였다.",
-          "몽골 제일주의를 수용하여 색목인에게 재정 업무를 전담시켰다.",
-          "수도를 베이징으로 옮기고 자금성을 건립하여 북방 민족을 직접 정벌하려 하였다.",
-          "과거제를 폐지하고 음서 제도로만 한족 관리를 선발하려 하였다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 1-(2): 홍무제는 재상제를 폐지하여 6부를 직접 통치(황제권 강화)하고 몽골 풍습 금지 및 과거제 정비로 한족 전통을 회복했습니다."
-      },
-      {
-        chasiId: "50-51",
-        chasiLabel: "50~51차시 [심화]",
-        material: "학습지 본문 1-(2): '메호메트 2세: 비잔티움 제국 정복, 콘스탄티노폴리스로 천도(1453) → 콘스탄티노폴리스를 이스탄불이라고 부름 / 술탄·칼리프제: 술탄이 아바스 왕조의 마지막 후손으로부터 칼리프의 칭호를 받음 → 이슬람 세계의 정치적·종교적 최고 지배자가 됨'",
-        question: "위 자료에 나타난 오스만 제국의 발전 과정에 대한 설명으로 옳은 것은?",
-        options: [
-          "메호메트 2세가 콘스탄티노폴리스를 정복하고 수도를 이스탄불로 삼았다.",
-          "술탄은 종교적 권한 없이 정치적 군사 권한만 행사하였다.",
-          "비잔티움 제국을 멸망시킨 후 크리스트교 성상을 모조리 파괴하고 주민을 추방하였다.",
-          "아바스 왕조의 침략을 받아 수도를 이스탄불에서 빈으로 이전하였다.",
-          "쉴레이만 1세 사후 칼리프 칭호를 로마 교황에게 양도하였다."
-        ],
-        correctIndex: 0,
-        explanation: "학습지 1-(2): 메호메트 2세는 1453년 비잔티움 제국을 정복하고 콘스탄티노폴리스를 이스탄불로 부르며 수도로 삼았습니다."
-      },
-      {
-        chasiId: "56-57",
-        chasiLabel: "56~57차시 [심화]",
-        material: "학습지 본문 1-(2): '전개: 의회의 권리 청원 제출(\"의회의 동의 없이 세금을 부과할 수 없다.\") → 찰스 1세의 승인 → 찰스 1세가 의회를 해산함 → 청교도들이 중심이 된 의회파와 국왕을 지지하는 왕당파 사이에 내전이 발생함'",
-        question: "영국의 청교도 혁명이 발생하게 된 직접적인 대립 배경으로 가장 적절한 것은?",
-        options: [
-          "의회가 권리장전을 제출하여 공화정을 요구했기 때문이다.",
-          "국왕 찰스 1세가 의회의 동의 없이 과세하고, 권리 청원 승인 후 의회를 해산했기 때문이다.",
-          "제임스 2세가 가톨릭을 강요하며 의회와 충돌했기 때문이다.",
-          "동인도 회사가 아메리카에 차 독점 판매권을 요구했기 때문이다.",
-          "크롬웰이 호국경에 취임하여 의회를 강제로 해산했기 때문이다."
-        ],
-        correctIndex: 1,
-        explanation: "학습지 1-(2): 찰스 1세의 의회 무시 과세, 권리 청원 승인 후 의회 해산이 내전(청교도 혁명)의 직접적인 배경이 되었습니다."
-      }
-    ];
-
-    /* ========================================================
-       5. 서술형 문항 풀 (학습지 단어 및 채점표 기준)
-       ======================================================== */
-    const ESSAY_DATA_POOL = [
-      {
-        id: "es-1",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        question: "카롤루스 대제가 서유럽 문화의 기틀을 마련했다고 평가받는 이유를 교황에게 받은 관과 어우러진 세 가지 문화 요소를 들어 서술하시오.",
-        exactKeywords: ["서로마 황제의 관", "게르만 문화", "로마 문화", "크리스트교"],
-        modelAnswer: "카롤루스 대제는 로마 교황으로부터 서로마 황제의 관을 받았으며(800), 게르만 문화, 로마 문화, 크리스트교가 어우러진 서유럽 문화의 기틀을 마련하였습니다.",
-        rubric: [
-          "로마 교황으로부터 서로마 황제의 관을 받았음을 서술함 (2점)",
-          "게르만 문화, 로마 문화, 크리스트교의 세 요소를 정확히 제시함 (3점)"
-        ]
-      },
-      {
-        id: "es-2",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        question: "중세 서유럽 봉건 주종제에서 주군과 봉신이 맺은 '계약 관계'의 특징을 땅(봉토)과 상호 의무를 중심으로 서술하시오.",
-        exactKeywords: ["봉토", "의무", "계약 관계", "충성"],
-        modelAnswer: "주군은 기사에게 땅(봉토)을 주고 보호하며, 봉신은 주군을 섬기고 충성과 봉사를 맹세하여 서로 의무를 지켜야 하는 계약 관계였습니다.",
-        rubric: [
-          "땅(봉토)을 매개로 한 관계임을 명시 (2점)",
-          "서로 의무를 지켜야 하는 계약 관계임을 서술 (3점)"
-        ]
-      },
-      {
-        id: "es-3",
-        chasiId: "38",
-        chasiLabel: "38차시",
-        question: "1077년 '카노사의 굴욕'이 일어나게 된 배경(대립의 원인)과 그 결과를 학습지 인물과 사건을 들어 서술하시오.",
-        exactKeywords: ["성직자 임명", "그레고리우스 7세", "하인리히 4세", "파문", "사죄"],
-        modelAnswer: "교황 그레고리우스 7세가 세속 군주의 성직자 임명을 금지하자 신성 로마 제국 황제 하인리히 4세가 대립하였고, 교황이 황제를 파문하자 황제가 카노사성에 가서 사죄하였습니다.",
-        rubric: [
-          "성직자 임명권을 둘러싼 교황과 황제의 대립 서술 (2점)",
-          "교황의 파문과 황제의 카노사성 사죄 결과 명시 (3점)"
-        ]
-      },
-      {
-        id: "es-4",
-        chasiId: "39",
-        chasiLabel: "39차시",
-        question: "십자군 전쟁의 결과가 서유럽 사회의 교황 권위, 봉건 세력, 왕권에 미친 변화를 서술하시오.",
-        exactKeywords: ["교황의 권위 하락", "제후", "기사", "약화", "왕권 강화"],
-        modelAnswer: "전쟁을 이끈 교황의 권위 하락, 전쟁에 참여한 제후와 기사 세력 약화, 상대적으로 왕권 강화가 나타나 서유럽이 중앙 집권 국가로 성장하는 데 영향을 주었습니다.",
-        rubric: [
-          "교황의 권위 하락 서술 (1.5점)",
-          "제후와 기사 세력 약화 서술 (1.5점)",
-          "왕권 강화 및 중앙 집권 국가 성장 서술 (2점)"
-        ]
-      },
-      {
-        id: "es-5",
-        chasiId: "40",
-        chasiLabel: "40차시",
-        question: "14세기 흑사병 유행이 서유럽 장원의 농노 처우와 봉건 사회에 미친 영향을 서술하시오.",
-        exactKeywords: ["인구 감소", "노동력 부족", "처우 개선", "장원 해체"],
-        modelAnswer: "흑사병 유행으로 인구 감소와 노동력 부족이 나타나자 영주들이 농노(농민)의 처우를 개선해 주었고, 이후 농노 신분 해방으로 이어져 장원 해체와 봉건 사회의 동요를 가져왔습니다.",
-        rubric: [
-          "인구 감소와 노동력 부족 언급 (2점)",
-          "농노 처우 개선 및 장원 해체 결과 기술 (3점)"
-        ]
-      },
-      {
-        id: "es-6",
-        chasiId: "41",
-        chasiLabel: "41차시",
-        question: "이탈리아의 르네상스와 16세기 이후 알프스 이북의 르네상스의 특징을 비교하여 서술하시오.",
-        exactKeywords: ["인문주의", "그리스·로마", "현실 사회", "교회", "비판"],
-        modelAnswer: "이탈리아 르네상스는 고대 그리스·로마 문화를 되살려 인간의 개성과 능력을 중시하는 인문주의가 발달한 반면, 알프스 이북의 르네상스는 현실 사회와 교회의 문제점을 비판하는 경향이 강했습니다.",
-        rubric: [
-          "이탈리아 르네상스의 인문주의 특징 기술 (2.5점)",
-          "알프스 이북의 현실 사회 및 교회 비판 경향 기술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-7",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        question: "송 태조가 실시한 '문치주의 정책'의 내용과 그로 인해 송나라에 나타난 결과를 서술하시오.",
-        exactKeywords: ["문치주의", "황제의 군사권 강화", "사대부", "군사력 약화"],
-        modelAnswer: "황제의 군사권을 강화하고 절도사의 권한을 약화시키며 문인을 우대하는 문치주의 정책을 실시하여 사대부 계층이 형성되었으나 군사력 약화를 가져왔습니다.",
-        rubric: [
-          "문인을 우대하는 문치주의 정책 내용 명시 (2점)",
-          "사대부 계층 형성 및 군사력 약화 결과 명시 (3점)"
-        ]
-      },
-      {
-        id: "es-8",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        question: "원나라의 신분 통치 제도인 '몽골 제일주의'에서 몽골인, 색목인, 한인·남인의 역할과 대우 차이를 서술하시오.",
-        exactKeywords: ["몽골인", "주요 관직 독점", "색목인", "재정", "행정", "한인", "남인", "차별"],
-        modelAnswer: "몽골인은 주요 관직을 독점하고 색목인은 재정·행정 업무를 담당하며 우대를 받았으나, 피지배층인 한인과 남인은 사회적으로 차별 대우를 받았습니다.",
-        rubric: [
-          "몽골인의 주요 관직 독점 및 색목인의 재정·행정 담당 서술 (2.5점)",
-          "한인·남인에 대한 차별 대우 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-9",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        question: "청나라가 다수의 한족을 통치하기 위해 실시한 '회유책'과 '강경책'의 구체적인 사례를 각각 서술하시오.",
-        exactKeywords: ["회유책", "만한병용제", "과거제", "강경책", "변발", "호복"],
-        modelAnswer: "회유책으로는 중요한 관직에 만주족과 한족을 함께 등용하는 만한병용제와 과거제를 실시하였고, 강경책으로는 만주족의 풍습인 변발과 호복 강요 및 청 왕조를 비판하는 서적을 금지하였습니다.",
-        rubric: [
-          "회유책(만한병용제, 과거제 등)의 사례 정확히 서술 (2.5점)",
-          "강경책(변발과 호복 강요 등)의 사례 정확히 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-10",
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        question: "신항로 개척 이후 형성된 '대서양 삼각 무역'의 구조를 유럽, 아프리카, 아메리카를 연결하여 서술하시오.",
-        exactKeywords: ["대서양", "삼각 무역", "노예", "아메리카", "작물"],
-        modelAnswer: "유럽, 아메리카, 아프리카를 잇는 삼각 무역이 발전하여 아프리카 원주민을 아메리카의 대농장에 노예로 동원하였고, 아메리카의 새로운 작물과 금·은이 유럽으로 유입되었습니다.",
-        rubric: [
-          "대서양 삼각 무역의 형태 서술 (2점)",
-          "아프리카 노예 동원 및 아메리카 물자 유입 기술 (3점)"
-        ]
-      },
-      {
-        id: "es-11",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        question: "종교 개혁 시기 마르틴 루터와 칼뱅의 핵심 주장을 각각 서술하시오.",
-        exactKeywords: ["루터", "면벌부", "95개조 반박문", "칼뱅", "예정설", "상공업자"],
-        modelAnswer: "루터는 교황청의 면벌부 판매에 반대하여 『95개조 반박문』을 발표하였고, 칼뱅은 구원은 신에 의해 정해져 있다는 예정설을 주장하여 상공업자들의 환영을 받았습니다.",
-        rubric: [
-          "루터의 면벌부 판매 반대 및 95개조 반박문 서술 (2.5점)",
-          "칼뱅의 예정설 및 상공업자 환영 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-12",
-        chasiId: "49",
-        chasiLabel: "49차시",
-        question: "무굴 제국의 아크바르 황제가 비이슬람교도를 포용하기 위해 실시한 정책의 내용을 서술하시오.",
-        exactKeywords: ["비이슬람교도", "인두세", "지즈야", "폐지", "관직"],
-        modelAnswer: "아크바르 황제는 비이슬람교도에게 거두던 인두세(지즈야)를 폐지하고, 힌두교도에게 관직을 주는 등 종교 다양성을 존중하는 정책을 펼쳤습니다.",
-        rubric: [
-          "인두세(지즈야) 폐지 언급 (2.5점)",
-          "힌두교도 관직 부여 및 종교 다양성 존중 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-13",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        question: "오스만 제국이 다민족·다종교 사회를 다스리기 위해 실시한 '밀레트' 제도의 내용을 서술하시오.",
-        exactKeywords: ["비이슬람교도", "세금", "종교 공동체", "밀레트", "자치"],
-        modelAnswer: "비이슬람교도라도 세금(인두세)을 내면 독자적인 종교 공동체(밀레트)의 자치를 인정해 주었습니다.",
-        rubric: [
-          "세금 납부를 조건으로 명시 (2점)",
-          "종교 공동체 밀레트의 자치 인정 서술 (3점)"
-        ]
-      },
-      {
-        id: "es-14",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        question: "영국의 명예혁명(1688)으로 승인된 '권리장전'의 핵심 내용과 그것이 영국 정치에 미친 의의를 서술하시오.",
-        exactKeywords: ["의회", "동의", "국왕", "입헌 군주제"],
-        modelAnswer: "국왕이 의회의 동의 없이 법의 효력을 정지하거나 과세할 수 없게 하였으며, 의회를 중심으로 한 입헌 군주제의 기초를 마련하였습니다.",
-        rubric: [
-          "의회 동의 없는 과세·법 효력 정지 금지 서술 (2.5점)",
-          "입헌 군주제의 기초 마련 의의 명시 (2.5점)"
-        ]
-      },
-      {
-        id: "es-15",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        question: "프랑스 혁명의 배경이 된 '구제도의 모순'을 제1·2신분과 제3신분의 차이를 들어 서술하시오.",
-        exactKeywords: ["제1신분", "제2신분", "면세", "제3신분", "세금", "정치"],
-        modelAnswer: "인구의 약 2%인 제1·2신분은 많은 토지를 차지하고 면세 특권을 누렸으나, 인구의 약 98%인 제3신분은 무거운 세금에 시달리면서도 정치에 참여하지 못했습니다.",
-        rubric: [
-          "제1·2신분의 토지 차지 및 면세 특권 서술 (2.5점)",
-          "제3신분의 무거운 세금 및 정치적 무권리 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-16",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        question: "프로이센의 비스마르크가 추진한 '철혈 정책'의 내용과 그 결과를 서술하시오.",
-        exactKeywords: ["무력", "군사력 강화", "오스트리아", "프랑스", "독일 제국"],
-        modelAnswer: "독일의 통일은 협상이 아니라 무력(군사력 강화)으로만 달성할 수 있다는 철혈 정책을 추진하여 오스트리아와 프랑스를 격파하고 독일 제국을 성립시켰습니다.",
-        rubric: [
-          "무력(군사력 강화)에 의한 통일 정책 서술 (2.5점)",
-          "오스트리아·프랑스 격파 및 독일 제국 성립 명시 (2.5점)"
-        ]
-      },
-      {
-        id: "es-17",
-        chasiId: "62",
-        chasiLabel: "62차시",
-        question: "1823년 발표된 미국의 '먼로 선언'의 핵심 내용과 라틴 아메리카에 미친 영향을 서술하시오.",
-        exactKeywords: ["유럽", "아메리카", "간섭", "선언"],
-        modelAnswer: "유럽이 아메리카 대륙에 간섭하는 것을 허용하지 않겠다고 선언하여 라틴 아메리카 국가들의 독립운동을 외교적으로 뒷받침하였습니다.",
-        rubric: [
-          "유럽의 아메리카 대륙 간섭 불허 내용 명시 (3점)",
-          "라틴 아메리카 독립 외교적 지원 영향 서술 (2점)"
-        ]
-      },
-      {
-        id: "es-18",
-        chasiId: "40",
-        chasiLabel: "40차시",
-        question: "백년 전쟁과 장미 전쟁이 영국과 프랑스의 왕권 및 정치 형태에 미친 공통적인 영향을 서술하시오.",
-        exactKeywords: ["왕권 강화", "봉건 영주", "몰락", "중앙 집권 국가"],
-        modelAnswer: "전쟁에 참여한 봉건 영주들이 몰락하고 왕권이 강화됨으로써 서유럽 각국이 중앙 집권 국가로 성장하는 발판을 마련하였습니다.",
-        rubric: [
-          "봉건 영주 세력의 몰락 서술 (2점)",
-          "왕권 강화 및 중앙 집권 국가 성장 서술 (3점)"
-        ]
-      },
-      {
-        id: "es-19",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        question: "명나라 영락제가 정화의 함대를 해외에 파견한 주된 목적과 그 결과를 서술하시오.",
-        exactKeywords: ["국력 과시", "조공 관계", "정화", "항해"],
-        modelAnswer: "국력을 과시하고 여러 나라와 조공 관계를 맺고자 정화의 함대를 해외에 파견하였으며, 동남아시아, 인도, 아프리카까지 진출하여 많은 항해 지식을 남겼습니다.",
-        rubric: [
-          "국력 과시 및 조공 관계(조공·책봉 체제) 체결 목적 서술 (2.5점)",
-          "아프리카까지 진출 및 항해 지식 축적 결과 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-20",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        question: "오스만 제국이 친위 부대인 '예니체리'를 양성한 방법과 그 역할을 서술하시오.",
-        exactKeywords: ["정복지", "크리스트교", "개종", "훈련", "술탄", "정예군"],
-        modelAnswer: "정복지의 크리스트교도를 이슬람교로 개종시킨 후 훈련과 교육을 받게 하여 술탄에게 충성을 다하는 친위 정예군으로 양성하였습니다.",
-        rubric: [
-          "정복지 크리스트교도를 이슬람교로 개종 및 훈련시킴을 명시 (2.5점)",
-          "술탄의 정예군(친위 부대) 역할 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-21",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        question: "프랑스의 루이 14세가 왕권을 신성화하기 위해 내세운 사상과 권위를 과시하기 위해 설립한 궁궐의 명칭을 서술하시오.",
-        exactKeywords: ["왕권신수설", "베르사유 궁전", "절대복종"],
-        modelAnswer: "왕의 권리는 신에게 받은 절대적인 것이라는 왕권신수설을 주장하였으며, 베르사유 궁전을 설립하여 권위를 과시하였습니다.",
-        rubric: [
-          "왕권신수설 사상 명시 (2.5점)",
-          "베르사유 궁전 설립 서술 (2.5점)"
-        ]
-      },
-      {
-        id: "es-22",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        question: "나폴레옹이 '대륙 봉쇄령'을 발표한 목적과 그 결과 몰락하게 된 배경을 서술하시오.",
-        exactKeywords: ["영국 고립", "무역 금지", "러시아", "원정 실패", "몰락"],
-        modelAnswer: "영국을 고립시킬 목적으로 유럽 대륙과 영국 간의 무역을 금지하였으나, 러시아가 이를 어기자 러시아 원정에 나섰다가 혹독한 추위 속에 참패하여 몰락하였습니다.",
-        rubric: [
-          "영국 고립 목적의 무역 금지(대륙 봉쇄령) 명시 (2.5점)",
-          "러시아의 위반과 러시아 원정 참패 결과 서술 (2.5점)"
-        ]
-      }
-    ];
-
-    /* ========================================================
-       5-2. 개념 확인 빈칸 타이핑 풀 (학습지 괄호 정답 100% 반영)
-       ======================================================== */
-    const FILLIN_DATA_POOL = [
-      // 34~35차시
-      {
-        id: "fi-1",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        sentence: "4세기 말 훈족의 압박을 받아 대규모 이동을 하여 서로마 제국을 멸망시킨 민족은 (빈칸)이다.",
-        answer: "게르만족",
-        hint: "ㄱㄹㅁㅈ",
-        explanation: "학습지 1-(1): 게르만족의 이동"
-      },
-      {
-        id: "fi-2",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        sentence: "프랑크 왕국의 전성기를 이끌었으며, 800년 로마 교황 레오 3세로부터 서로마 황제의 관을 받은 인물은 (빈칸)이다.",
-        answer: "카롤루스 대제",
-        hint: "ㅋㄹㄹㅅ ㄷㅈ",
-        explanation: "학습지 1-(3): 프랑크 왕국의 전성기 (카롤루스 대제 시기)"
-      },
-      {
-        id: "fi-3",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        sentence: "카롤루스 대제 사후 프랑크 왕국이 서·중·동프랑크로 분열되는 계기가 된 두 조약은 (빈칸) 조약과 메르센 조약이다.",
-        answer: "베르됭",
-        hint: "ㅂㄹㄷ",
-        explanation: "학습지 1-(4): 베르됭 조약, 메르센 조약 체결"
-      },
-      {
-        id: "fi-4",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        sentence: "비잔티움 제국의 6세기 전성기를 이끈 황제로, 대법전을 편찬하고 성 소피아 대성당을 건립한 인물은 (빈칸)이다.",
-        answer: "유스티니아누스",
-        hint: "ㅇㅅㅌㄴㅇㄴㅅ",
-        explanation: "학습지 2-(3): 전성기 6세기 유스티니아누스 시기"
-      },
-      {
-        id: "fi-5",
-        chasiId: "34-35",
-        chasiLabel: "34~35차시",
-        sentence: "비잔티움 제국의 거대한 돔과 내부 벽면을 장식한 미술 기법은 (빈칸) 벽화이다.",
-        answer: "모자이크",
-        hint: "ㅁㅈㅇㅋ",
-        explanation: "학습지 자료 ②: 내부를 모자이크 벽화로 장식"
-      },
-      // 36~37차시
-      {
-        id: "fi-6",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        sentence: "중세 서유럽에서 땅을 매개로 주군과 봉신 간에 서로 의무를 지키도록 맺어진 제도는 (빈칸)이다.",
-        answer: "주종제",
-        hint: "ㅈㅈㅈ",
-        explanation: "학습지 1-(2): 주종제 (땅을 매개로 한 계약 관계)"
-      },
-      {
-        id: "fi-7",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        sentence: "주종제에서 주군이 봉신에게 지급한 땅을 (빈칸)(이)라고 부른다.",
-        answer: "봉토",
-        hint: "ㅂㅌ",
-        explanation: "학습지 1-(2): 주군은 기사에게 땅(봉토)을 주고"
-      },
-      {
-        id: "fi-8",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        sentence: "봉신의 봉토 운영 방식으로 영주의 성, 교회, 경작지 등으로 이루어진 조직 형태는 (빈칸)이다.",
-        answer: "장원제",
-        hint: "ㅈㅇㅈ",
-        explanation: "학습지 1-(3): 장원제 (봉신의 봉토 운영 방식)"
-      },
-      {
-        id: "fi-9",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        sentence: "영주에게 세금을 내며 농사짓고 영주의 허락 없이 장원을 떠날 수 없었던 계층은 (빈칸)이다.",
-        answer: "농노",
-        hint: "ㄴㄴ",
-        explanation: "학습지 1-(3)-③: 농노"
-      },
-      {
-        id: "fi-10",
-        chasiId: "36-37",
-        chasiLabel: "36~37차시",
-        sentence: "12세기 이후 유행한 건축 양식으로, 뾰족한 탑과 샤르트르 대성당의 화려한 색유리그림(스테인드글라스)이 대표적인 것은 (빈칸) 양식이다.",
-        answer: "고딕",
-        hint: "ㄱㄷ",
-        explanation: "학습지 3-(3): 고딕 양식 (뾰족한 탑, 색유리그림)"
-      },
-      // 38차시
-      {
-        id: "fi-11",
-        chasiId: "38",
-        chasiLabel: "38차시",
-        sentence: "10세기 초 교회의 세속화와 부패를 개혁하기 위해 기도, 고전 연구, 노동을 강조하며 교회 개혁 운동을 이끈 곳은 (빈칸) 수도원이다.",
-        answer: "클뤼니",
-        hint: "ㅋㄹㄴ",
-        explanation: "학습지 1-(2): 클뤼니 수도원을 중심으로 교회 개혁 운동"
-      },
-      {
-        id: "fi-12",
-        chasiId: "38",
-        chasiLabel: "38차시",
-        sentence: "1077년 신성 로마 제국 황제 하인리히 4세가 성직자 임명권 문제로 파문당한 뒤 교황에게 사죄한 사건은 (빈칸)의 굴욕이다.",
-        answer: "카노사",
-        hint: "ㅋㄴㅅ",
-        explanation: "학습지 2-(1): 카노사의 굴욕 (1077)"
-      },
-      {
-        id: "fi-13",
-        chasiId: "38",
-        chasiLabel: "38차시",
-        sentence: "1122년 교황만이 성직자 임명권을 가질 수 있다고 황제와 맺어 합의한 협약은 (빈칸) 협약이다.",
-        answer: "보름스",
-        hint: "ㅂㄹㅅ",
-        explanation: "학습지 2-(2): 보름스 협약 (1122)"
-      },
-      {
-        id: "fi-14",
-        chasiId: "38",
-        chasiLabel: "38차시",
-        sentence: "13세기 후반 프랑스 국왕 필리프 4세가 교황청을 프랑스로 옮겨 약 70년 동안 교황들이 머문 사건은 (빈칸) 유수이다.",
-        answer: "아비뇽",
-        hint: "ㅇㅂㄴ",
-        explanation: "학습지 3-(1): 아비뇽 유수"
-      },
-      // 39차시
-      {
-        id: "fi-15",
-        chasiId: "39",
-        chasiLabel: "39차시",
-        sentence: "셀주크 튀르크가 바그다드를 정복한 뒤 아바스 왕조의 칼리프로부터 얻은 지배자의 칭호는 (빈칸)이다.",
-        answer: "술탄",
-        hint: "ㅅㅌ",
-        explanation: "학습지 1-(2): 칼리프로부터 술탄의 칭호를 얻음"
-      },
-      {
-        id: "fi-16",
-        chasiId: "39",
-        chasiLabel: "39차시",
-        sentence: "11세기 후반 셀주크 튀르크가 점령하여 십자군 전쟁의 원인이 된 크리스트교 성지는 (빈칸)이다.",
-        answer: "예루살렘",
-        hint: "ㅇㄹㅅㄹ",
-        explanation: "학습지 2-(1): 성지 예루살렘을 점령"
-      },
-      {
-        id: "fi-17",
-        chasiId: "39",
-        chasiLabel: "39차시",
-        sentence: "교황 우르바누스 2세가 성지 회복을 위한 전쟁 참여를 호소하며 개최한 회의는 (빈칸) 공의회이다.",
-        answer: "클레르몽",
-        hint: "ㅋㄹㄹㅁ",
-        explanation: "학습지 2-(1): 클레르몽 공의회에서 전쟁 참여 호소"
-      },
-      {
-        id: "fi-18",
-        chasiId: "39",
-        chasiLabel: "39차시",
-        sentence: "십자군 전쟁의 영향으로 유럽 상인들이 지중해 무역을 활성화하면서 베네치아, 제노바 등 (빈칸) 연안 도시들이 번성하였다.",
-        answer: "지중해",
-        hint: "ㅈㅈㅎ",
-        explanation: "학습지 3-(3): 지중해 연안 도시들 번성"
-      },
-      // 40차시
-      {
-        id: "fi-19",
-        chasiId: "40",
-        chasiLabel: "40차시",
-        sentence: "14세기 유럽 인구의 약 3분의 1을 사망에 이르게 하여 심각한 노동력 부족을 일으킨 전염병은 (빈칸)이다.",
-        answer: "흑사병",
-        hint: "ㅎㅅㅂ",
-        explanation: "학습지 1-(1): 흑사병 유행"
-      },
-      {
-        id: "fi-20",
-        chasiId: "40",
-        chasiLabel: "40차시",
-        sentence: "중세 도시에서 상인과 수공업자들이 권익을 지키기 위해 결성한 동업 조합은 (빈칸)이다.",
-        answer: "길드",
-        hint: "ㄱㄷ",
-        explanation: "학습지 2-(2): 동업 조합인 길드를 결성"
-      },
-      {
-        id: "fi-21",
-        chasiId: "40",
-        chasiLabel: "40차시",
-        sentence: "영국의 왕위 계승 문제를 둘러싸고 발생하여 봉건 영주들이 대거 몰락하고 왕권이 강화된 내전은 (빈칸) 전쟁이다.",
-        answer: "장미",
-        hint: "ㅈㅁ",
-        explanation: "학습지 3-(2): 장미 전쟁"
-      },
-      // 41차시
-      {
-        id: "fi-25",
-        chasiId: "41",
-        chasiLabel: "41차시",
-        sentence: "지식과 사상 보급에 기여한 활판 인쇄술을 발명한 인물은 (빈칸)이다.",
-        answer: "구텐베르크",
-        hint: "ㄱㅌㅂㄹㅋ",
-        explanation: "학습지 3-(2): 구텐베르크의 활판 인쇄술 발명"
-      },
-      // 42~43차시
-      {
-        id: "fi-35",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "송 태조가 황제의 군사권을 강화하고 절도사의 권한을 약화시키기 위해 문인을 우대한 정책은 (빈칸) 정책이다.",
-        answer: "문치주의",
-        hint: "ㅁㅊㅈㅇ",
-        explanation: "학습지 1-(2): 문인을 우대하는 문치주의 정책 실시"
-      },
-      {
-        id: "fi-36",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "송나라 때 문치주의와 전시 제도를 거쳐 새로운 지배 세력으로 형성된 계층은 (빈칸) 계층이다.",
-        answer: "사대부",
-        hint: "ㅅㄷㅂ",
-        explanation: "학습지 1-(2): 사대부 계층 형성"
-      },
-      {
-        id: "fi-37",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "북방 민족에게 평화 유지의 대가를 지불하여 재정이 악화되자 부국강병을 목표로 개혁을 시도한 인물은 (빈칸)이다.",
-        answer: "왕안석",
-        hint: "ㅇㅇㅅ",
-        explanation: "학습지 1-(3): 왕안석의 개혁"
-      },
-      {
-        id: "fi-38",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "탕구트족이 건국하여 동서 비단길 무역로를 차지하고 송을 압박한 북방 국가는 (빈칸)이다.",
-        answer: "서하",
-        hint: "ㅅㅎ",
-        explanation: "학습지 2-(2): 서하 (탕구트가 건국)"
-      },
-      {
-        id: "fi-39",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "우주의 원리와 인간의 본성을 탐구하여 동아시아 각국의 통치 이념이 된 주희가 집대성한 유학은 (빈칸)이다.",
-        answer: "성리학",
-        hint: "ㅅㄹㅎ",
-        explanation: "학습지 3-(4): 주희의 성리학 완성"
-      },
-      {
-        id: "fi-40",
-        chasiId: "42-43",
-        chasiLabel: "42~43차시",
-        sentence: "송대 주요 무역 항구에 설치되어 해상 세금과 무역 업무를 담당한 관청은 (빈칸)이다.",
-        answer: "시박사",
-        hint: "ㅅㅂㅅ",
-        explanation: "학습지 4-(1): 주요 항구에 시박사 설치"
-      },
-      // 44~45차시
-      {
-        id: "fi-41",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        sentence: "몽골 부족을 통일하고 1206년 몽골 제국을 수립한 인물은 (빈칸)이다.",
-        answer: "칭기즈 칸",
-        hint: "ㅊㄱㅈ ㅋ",
-        explanation: "학습지 1-(1): 칭기즈 칸"
-      },
-      {
-        id: "fi-42",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        sentence: "칭기즈 칸 사후 후대 칸들의 영토 확체로 형성된 독립 영토 연합체를 (빈칸)(이)라고 한다.",
-        answer: "울루스",
-        hint: "ㅇㄹㅅ",
-        explanation: "학습지 1-(2): 여러 울루스의 느슨한 연합으로 유지"
-      },
-      {
-        id: "fi-43",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        sentence: "원나라에서 여러 민족의 언어를 표기하기 위해 티베트 문자를 본떠 제작한 공용 문자는 (빈칸) 문자이다.",
-        answer: "파스파",
-        hint: "ㅍㅅㅍ",
-        explanation: "학습지 2-(2): 공용 문자인 파스파 문자를 제작"
-      },
-      {
-        id: "fi-44",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        sentence: "몽골 제국에서 도로망을 정비하여 관리나 사신에게 숙식과 말을 제공한 교통 제도는 (빈칸)이다.",
-        answer: "역참",
-        hint: "ㅇㅊ",
-        explanation: "학습지 4-(1): 역참 설치"
-      },
-      {
-        id: "fi-45",
-        chasiId: "44-45",
-        chasiLabel: "44~45차시",
-        sentence: "이슬람의 천문학과 역법의 영향을 받아 원나라의 곽수경이 제작한 새로운 달력은 『(빈칸)』이다.",
-        answer: "수시력",
-        hint: "ㅅㅅㄹ",
-        explanation: "학습지 5-(2): 곽수경이 『수시력』을 만듦"
-      },
-      // 46~47차시
-      {
-        id: "fi-46",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "명나라 홍무제가 황제권을 강화하기 위해 폐지하고 6부를 직접 통치하게 한 관직은 (빈칸)이다.",
-        answer: "재상제",
-        hint: "ㅈㅅㅈ",
-        explanation: "학습지 1-(2): 재상제 폐지"
-      },
-      {
-        id: "fi-47",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "명나라 영락제가 베이징으로 천도하면서 황제의 권위를 과시하기 위해 건설한 궁궐은 (빈칸)이다.",
-        answer: "자금성",
-        hint: "ㅈㄱㅅ",
-        explanation: "학습지 1-(3): 자금성 건설 후 베이징으로 수도 이전"
-      },
-      {
-        id: "fi-48",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "영락제의 명을 받아 해외에 파견되어 동남아시아와 인도, 아프리카까지 대항해를 펼친 인물은 (빈칸)이다.",
-        answer: "정화",
-        hint: "ㅈㅎ",
-        explanation: "학습지 1-(3): 정화의 함대 해외 파견"
-      },
-      {
-        id: "fi-48-2",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "영락제가 정화의 함대를 해외에 보내 국력을 과시하고 여러 나라와 맺은 국제 외교 관계는 (빈칸) 관계이다.",
-        answer: "조공",
-        hint: "ㅈㄱ",
-        explanation: "학습지 자료 ①: 여러 나라와 조공 관계(조공·책봉 체제)를 맺음"
-      },
-      {
-        id: "fi-49",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "청나라가 한족을 다스리기 위해 관직 등용과 과거제 실시 등을 통해 마음을 달랜 유화 정책은 (빈칸)이다.",
-        answer: "회유책",
-        hint: "ㅎㅇㅊ",
-        explanation: "학습지 2-(2)-①: 회유책 (만한병용제, 유학 교육 장려, 과거제 실시)"
-      },
-      {
-        id: "fi-49-2",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "명나라 때 은의 대량 유입에 따라 지세와 정세(인두세)를 은으로 통일하여 납부하게 한 세금 제도는 (빈칸)이다.",
-        answer: "일조편법",
-        hint: "ㅇㅈㅍㅂ",
-        explanation: "학습지 3번 세제 필기: 명나라 일조편법 (은으로 납부)"
-      },
-      {
-        id: "fi-49-3",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "청나라 때 정세(인두세)를 토지세인 지세에 포함시켜 지세만 은으로 납부하도록 단순화한 세금 제도는 (빈칸)이다.",
-        answer: "지정은제",
-        hint: "ㅈㅈㅇㅈ",
-        explanation: "학습지 3번 세제 필기: 청나라 지정은제 (지세만 은으로 납부)"
-      },
-      {
-        id: "fi-50",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "명과 청에서 과거 시험을 거쳐 관직에 진출하고 지역 사회를 이끌었던 지배 계층은 (빈칸)층이다.",
-        answer: "신사",
-        hint: "ㅅㅅ",
-        explanation: "학습지 3-(2): 신사층의 형성과 학문 발전"
-      },
-      {
-        id: "fi-51",
-        chasiId: "46-47",
-        chasiLabel: "46~47차시",
-        sentence: "청나라가 광저우 항구 한 곳만을 개방하고 서양 상인과의 무역을 독점하도록 허가한 상인 조합은 (빈칸)이다.",
-        answer: "공행",
-        hint: "ㄱㅎ",
-        explanation: "학습지 3-(3): 공행 무역만 허용"
-      },
-      // 49차시
-      {
-        id: "fi-52",
-        chasiId: "49",
-        chasiLabel: "49차시",
-        sentence: "인도의 델리를 정복하고 무굴 제국을 세운 인물은 (빈칸)이다.",
-        answer: "바부르",
-        hint: "ㅂㅂㄹ",
-        explanation: "학습지 1-(1): 바부르가 델리를 정복하고 이슬람 왕조를 세움"
-      },
-      {
-        id: "fi-53",
-        chasiId: "49",
-        chasiLabel: "49차시",
-        sentence: "아크바르 황제가 종교 다양성을 존중하기 위해 비이슬람교도에게 면제해 준 세금은 (빈칸)이다.",
-        answer: "인두세",
-        hint: "ㅇㄷㅅ",
-        explanation: "학습지 1-(2): 비이슬람교도에게 거두던 인두세(지즈야) 폐지"
-      },
-      {
-        id: "fi-54",
-        chasiId: "49",
-        chasiLabel: "49차시",
-        sentence: "인도 남부를 정복하여 최대 영토를 차지했으나 지즈야를 부활시켜 백성의 불만을 산 황제는 (빈칸) 황제이다.",
-        answer: "아우랑제브",
-        hint: "ㅇㅇㄹㅈㅂ",
-        explanation: "학습지 1-(2): 아우랑제브 황제"
-      },
-      // 50~51차시
-      {
-        id: "fi-57",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        sentence: "메호메트 2세가 콘스탄티노폴리스를 정복한 후 바꾼 수도의 이름은 (빈칸)이다.",
-        answer: "이스탄불",
-        hint: "ㅇㅅㅌㅂ",
-        explanation: "학습지 1-(2): 콘스탄티노폴리스를 이스탄불이라고 부름"
-      },
-      {
-        id: "fi-58",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        sentence: "헝가리를 정복하고 빈을 공격하여 오스만 제국의 전성기를 이끈 군주는 (빈칸) 1세이다.",
-        answer: "쉴레이만",
-        hint: "ㅅㄹㅇㅁ",
-        explanation: "학습지 1-(2): 쉴레이만 1세"
-      },
-      {
-        id: "fi-59",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        sentence: "오스만 제국에서 비이슬람교도에게 자치를 허용해 준 독자적 종교 공동체는 (빈칸)이다.",
-        answer: "밀레트",
-        hint: "ㅁㄹㅌ",
-        explanation: "학습지 2-(1): 밀레트 구성"
-      },
-      {
-        id: "fi-60",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        sentence: "정복지의 크리스트교 소년을 훈련시켜 조직한 술탄의 정예 친위 부대는 (빈칸)이다.",
-        answer: "예니체리",
-        hint: "ㅇㄴㅊㄹ",
-        explanation: "학습지 2-(1): 예니체리 양성"
-      },
-      {
-        id: "fi-61",
-        chasiId: "50-51",
-        chasiLabel: "50~51차시",
-        sentence: "오스만 제국에서 사교와 여론 형성의 중심지가 되었던 장소는 (빈칸)이다.",
-        answer: "커피하우스",
-        hint: "ㅋㅍㅎㅇㅅ",
-        explanation: "학습지 3-(2): 커피하우스를 중심으로 커피 문화 유행"
-      },
-      // 52~53차시
-      {
-        id: "fi-26",
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        sentence: "포르투갈의 항해사로 희망봉을 돌아 인도의 캘리컷에 도착하여 동쪽 항로를 개척한 인물은 (빈칸)이다.",
-        answer: "바스쿠 다가마",
-        hint: "ㅂㅅㅋ ㄷㄱㅁ",
-        explanation: "학습지 1-(2): 바스쿠 다가마"
-      },
-      {
-        id: "fi-27",
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        sentence: "에스파냐의 지원을 받아 대서양을 건너 서인도 제도에 도착한 항해가는 (빈칸)이다.",
-        answer: "콜럼버스",
-        hint: "ㅋㄹㅂㅅ",
-        explanation: "학습지 1-(2): 콜럼버스"
-      },
-      {
-        id: "fi-28",
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        sentence: "에스파냐의 코르테스에 의해 파괴된 멕시코고원의 고대 문명은 (빈칸) 문명이다.",
-        answer: "아스테카",
-        hint: "ㅇㅅㅌㅋ",
-        explanation: "학습지 3-(1): 아스테카 문명 (코르테스 정복)"
-      },
-      {
-        id: "fi-29",
-        chasiId: "52-53",
-        chasiLabel: "52~53차시",
-        sentence: "에스파냐의 피사로에 의해 파괴된 안데스고원의 고대 문명은 (빈칸) 문명이다.",
-        answer: "잉카",
-        hint: "ㅇㅋ",
-        explanation: "학습지 3-(1): 잉카 문명 (피사로 정복)"
-      },
-      // 54~55차시
-      {
-        id: "fi-30",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        sentence: "1517년 마르틴 루터가 로마 교황청의 면벌부 판매에 반대하여 발표한 글은 『(빈칸) 반박문』이다.",
-        answer: "95개조",
-        hint: "95ㄱㅈ",
-        explanation: "학습지 1-(1): 루터의 『95개조 반박문』 발표"
-      },
-      {
-        id: "fi-31",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        sentence: "구원은 신에 의해 이미 정해져 있다는 교리로 상공업자들의 환영을 받은 칼뱅의 사상은 (빈칸)이다.",
-        answer: "예정설",
-        hint: "ㅇㅈㅅ",
-        explanation: "학습지 1-(1): 칼뱅의 예정설 주장"
-      },
-      {
-        id: "fi-32",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        sentence: "독일에서 일어난 30년 전쟁의 결과로 체결된 조약은 (빈칸) 조약이다.",
-        answer: "베스트팔렌",
-        hint: "ㅂㅅㅌㅍㄹ",
-        explanation: "학습지 1-(3): 30년 전쟁 발발 → 베스트팔렌 조약"
-      },
-      {
-        id: "fi-33",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        sentence: "프랑스의 루이 14세가 내세운 사상으로, 왕의 권리는 신에게 받은 절대적인 것이라는 주장은 (빈칸)이다.",
-        answer: "왕권신수설",
-        hint: "ㅇㄱㅅㅅㅅ",
-        explanation: "학습지 3-(2): 왕권신수설 주장"
-      },
-      {
-        id: "fi-34",
-        chasiId: "54-55",
-        chasiLabel: "54~55차시",
-        sentence: "재정·군사 국가에서 수입은 제한하고 수출을 늘려 금과 은을 확보하고자 했던 경제 정책은 (빈칸) 정책이다.",
-        answer: "중상주의",
-        hint: "ㅈㅅㅈㅇ",
-        explanation: "학습지 2-(2): 중상주의 정책 실시"
-      },
-      // 56~57차시
-      {
-        id: "fi-62",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "영국에서 시민 계급과 귀족·자영농 사이의 지주 계층으로 혁명을 주도한 계층은 (빈칸)이다.",
-        answer: "젠트리",
-        hint: "ㅈㅌㄹ",
-        explanation: "학습지 1-(1): 젠트리의 성장"
-      },
-      {
-        id: "fi-63",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "찰스 1세의 과세에 맞서 영국 의회가 승인을 요구하며 제출한 문서는 (빈칸)이다.",
-        answer: "권리 청원",
-        hint: "ㄱㄹ ㅊㅇ",
-        explanation: "학습지 1-(2): 의회의 권리 청원 제출"
-      },
-      {
-        id: "fi-64",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "명예혁명 이후 국왕이 승인하여 입헌 군주제의 기틀을 마련한 문서는 (빈칸)이다.",
-        answer: "권리장전",
-        hint: "ㄱㄹㅈㅈ",
-        explanation: "학습지 2-(2): 권리장전을 국왕이 받아들임"
-      },
-      {
-        id: "fi-65",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "영국의 과세에 반발하여 식민지인들이 차 상자를 바다에 던진 사건은 (빈칸) 사건이다.",
-        answer: "보스턴 차",
-        hint: "ㅂㅅㅌ ㅊ",
-        explanation: "학습지 3-(2): 보스턴 차 사건(1773)"
-      },
-      {
-        id: "fi-66",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "1776년 미국 식민지 대표들이 필라델피아에서 발표한 문서는 (빈칸)이다.",
-        answer: "독립 선언",
-        hint: "ㄷㄹ ㅅㅇ",
-        explanation: "학습지 3-(2): 독립 선언 발표(1776)"
-      },
-      {
-        id: "fi-67",
-        chasiId: "56-57",
-        chasiLabel: "56~57차시",
-        sentence: "미국 혁명의 결과 세계 최초로 수립된 정치 형태는 (빈칸)이다.",
-        answer: "민주 공화국",
-        hint: "ㅁㅈ ㄱㅎㄱ",
-        explanation: "학습지 3-(3): 세계 최초의 민주 공화국 수립"
-      },
-      // 58~59차시
-      {
-        id: "fi-68",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        sentence: "프랑스 혁명의 배경이 된 특권 신분과 평민 사이의 불평등한 신분 제도를 (빈칸)의 모순이라 한다.",
-        answer: "구제도",
-        hint: "ㄱㅈㄷ",
-        explanation: "학습지 1-(1): 구제도의 모순"
-      },
-      {
-        id: "fi-69",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        sentence: "국민 의회가 봉건제 폐지와 함께 인간의 자유와 평등을 천명하며 발표한 선언은 (빈칸)이다.",
-        answer: "인권 선언",
-        hint: "ㅇㄱ ㅅㅇ",
-        explanation: "학습지 1-(3): 인권 선언 발표"
-      },
-      {
-        id: "fi-70",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        sentence: "국민 공회 시기 반대파를 단두대에서 처형하며 공포 정치를 이끈 인물은 (빈칸)이다.",
-        answer: "로베스피에르",
-        hint: "ㄹㅂㅅㅍㅇㄹ",
-        explanation: "학습지 1-(3): 로베스피에르의 공포 정치"
-      },
-      {
-        id: "fi-71",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        sentence: "나폴레옹이 새로운 시민 사회의 규범을 담아 1804년 편찬한 법전은 『(빈칸) 법전』이다.",
-        answer: "나폴레옹",
-        hint: "ㄴㅍㄹㅇ",
-        explanation: "학습지 2-(1): 『나폴레옹 법전』 편찬"
-      },
-      {
-        id: "fi-72",
-        chasiId: "58-59",
-        chasiLabel: "58~59차시",
-        sentence: "나폴레옹이 영국을 고립시키기 위해 유럽 대륙의 항구를 봉쇄한 명령은 (빈칸)이다.",
-        answer: "대륙 봉쇄령",
-        hint: "ㄷㄹ ㅂㅅㄹ",
-        explanation: "학습지 2-(2): 대륙 봉쇄령 선포"
-      },
-      // 60~61차시
-      {
-        id: "fi-73",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "나폴레옹 몰락 후 유럽 각국 대표들이 모여 옛 영토와 지배권을 되돌리려 한 체제는 (빈칸) 체제이다.",
-        answer: "빈",
-        hint: "ㅂ",
-        explanation: "학습지 1-(1): 빈 체제 형성"
-      },
-      {
-        id: "fi-74",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "1848년 프랑스에서 노동자들이 선거권 확대를 요구하여 공화정을 수립한 혁명은 (빈칸) 혁명이다.",
-        answer: "2월",
-        hint: "2ㅇ",
-        explanation: "학습지 2-(1): 2월 혁명(1848)"
-      },
-      {
-        id: "fi-75",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "영국 노동자들이 인민헌장을 발표하고 참정권을 요구하며 전개한 운동은 (빈칸) 운동이다.",
-        answer: "차티스트",
-        hint: "ㅊㅌㅅㅌ",
-        explanation: "학습지 2-(2): 차티스트 운동을 벌임"
-      },
-      {
-        id: "fi-76",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "의용대를 이끌고 시칠리아와 나폴리를 점령하여 통일 이탈리아 왕국에 바친 인물은 (빈칸)이다.",
-        answer: "가리발디",
-        hint: "ㄱㄹㅂㄷ",
-        explanation: "학습지 3-(1): 가리발디의 활약"
-      },
-      {
-        id: "fi-77",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "프로이센의 재상으로 철혈 정책을 추진하여 독일 통일을 이끈 인물은 (빈칸)이다.",
-        answer: "비스마르크",
-        hint: "ㅂㅅㅁㄹㅋ",
-        explanation: "학습지 3-(2): 비스마르크의 철혈 정책"
-      },
-      {
-        id: "fi-78",
-        chasiId: "60-61",
-        chasiLabel: "60~61차시",
-        sentence: "미국 남북 전쟁 중 1863년 링컨 대통령이 발표한 역사적인 선언은 (빈칸)이다.",
-        answer: "노예 해방 선언",
-        hint: "ㄴㅇ ㅎㅂ ㅅㅇ",
-        explanation: "학습지 4-(2): 링컨의 노예 해방 선언(1863)"
-      },
-      // 62차시
-      {
-        id: "fi-79",
-        chasiId: "62",
-        chasiLabel: "62차시",
-        sentence: "콜롬비아, 베네수엘라, 페루 등의 독립 투쟁을 이끈 라틴 아메리카의 대표적 지도자는 (빈칸)이다.",
-        answer: "볼리바르",
-        hint: "ㅂㄹㅂㄹ",
-        explanation: "학습지 1-(2): 볼리바르"
-      },
-      {
-        id: "fi-80",
-        chasiId: "62",
-        chasiLabel: "62차시",
-        sentence: "흑인 노예들의 독립운동으로 프랑스로부터 독립하여 세워진 라틴 아메리카 최초의 독립국은 (빈칸)이다.",
-        answer: "아이티",
-        hint: "ㅇㅇㅌ",
-        explanation: "학습지 1-(2): 아이티 최초로 독립국 건설"
-      },
-      {
-        id: "fi-81",
-        chasiId: "62",
-        chasiLabel: "62차시",
-        sentence: "1823년 미국 대통령이 유럽의 아메리카 대륙 간섭을 배격하기 위해 발표한 선언은 (빈칸)이다.",
-        answer: "먼로 선언",
-        hint: "ㅁㄹ ㅅㅇ",
-        explanation: "학습지 1-(3): 미국의 먼로 선언 발표"
-      }
-    ];
-
-    /* ========================================================
-       6. 애플리케이션 상태 제어
-       ======================================================== */
-    let currentMode = "summary";
-    let currentChasi = "all";
-
-    let currentQuizList = [];
-    let quizPointer = 0;
-    let userAnswers = [];
-    let submittedState = [];
-
-    function shuffleArray(arr) {
-      const clone = [...arr];
-      for (let i = clone.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [clone[i], clone[j]] = [clone[j], clone[i]];
-      }
-      return clone;
+    function switchTab(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeIdx = ['summary', 'quiz', 'blank', 'essay'].indexOf(tabName);
+      document.querySelectorAll('.tab-btn')[activeIdx].classList.add('active');
+      renderCurrentUnit();
     }
 
-    function changeMode(mode) {
-      currentMode = mode;
-      
-      const modes = ['summary', 'fillin', 'basic', 'advanced', 'essay'];
-      modes.forEach(m => {
-        const btn = document.getElementById(`tab-${m}`);
-        if (btn) {
-          if (m === mode) {
-            btn.className = "py-2.5 rounded-xl bg-white text-blue-700 shadow-sm text-center touch-target flex items-center justify-center font-black";
-          } else {
-            btn.className = "py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-center touch-target flex items-center justify-center font-bold";
-          }
-        }
-      });
+    function renderCurrentUnit() {
+      const unitIdx = parseInt(document.getElementById('unitSelect').value);
+      const data = database[unitIdx];
+      const content = document.getElementById('contentArea');
 
-      document.getElementById('view-summary').classList.add('hidden');
-      document.getElementById('view-fillin').classList.add('hidden');
-      document.getElementById('view-quiz').classList.add('hidden');
-      document.getElementById('view-essay').classList.add('hidden');
-
-      const badge = document.getElementById('current-badge');
-
-      if (mode === 'summary') {
-        badge.innerText = "핵심 요약";
-        badge.className = "px-3 py-1 text-xs font-black rounded-full bg-blue-50 text-blue-700 border border-blue-200";
-        document.getElementById('view-summary').classList.remove('hidden');
-        renderSummaryView();
-      } else if (mode === 'fillin') {
-        badge.innerText = "개념 확인 (빈칸)";
-        badge.className = "px-3 py-1 text-xs font-black rounded-full bg-blue-50 text-blue-700 border border-blue-200";
-        document.getElementById('view-fillin').classList.remove('hidden');
-        renderFillinView();
-      } else if (mode === 'basic') {
-        badge.innerText = "기본 5지선다";
-        badge.className = "px-3 py-1 text-xs font-black rounded-full bg-blue-50 text-blue-700 border border-blue-200";
-        document.getElementById('quiz-badge').innerText = "기본 5지선다";
-        document.getElementById('view-quiz').classList.remove('hidden');
-        reloadQuizSet();
-      } else if (mode === 'advanced') {
-        badge.innerText = "심화 사료 문제";
-        badge.className = "px-3 py-1 text-xs font-black rounded-full bg-amber-50 text-amber-800 border border-amber-200";
-        document.getElementById('quiz-badge').innerText = "심화 사료 문제";
-        document.getElementById('view-quiz').classList.remove('hidden');
-        reloadQuizSet();
-      } else if (mode === 'essay') {
-        badge.innerText = "서술형 연습";
-        badge.className = "px-3 py-1 text-xs font-black rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200";
-        document.getElementById('view-essay').classList.remove('hidden');
-        renderEssayView();
-      }
-    }
-
-    function renderChasiTabs() {
-      const container = document.getElementById('chasi-pill-list');
-      const select = document.getElementById('chasi-dropdown-select');
-      container.innerHTML = '';
-      if (select) select.innerHTML = '';
-
-      CHASI_DATA.forEach(c => {
-        // 1. 가로 알약 버튼
-        const btn = document.createElement('button');
-        const isActive = (c.id === currentChasi);
-        btn.id = `pill-chasi-${c.id}`;
-        btn.className = `touch-target px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition flex items-center justify-center ${
-          isActive 
-            ? 'bg-blue-600 text-white shadow-xs' 
-            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-        }`;
-        btn.innerText = c.label;
-        btn.onclick = () => {
-          selectChasi(c.id);
-        };
-        container.appendChild(btn);
-
-        // 2. 간편 드롭다운 옵션
-        if (select) {
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.innerText = c.label === "전체" ? "전체 보기" : c.label;
-          if (isActive) opt.selected = true;
-          select.appendChild(opt);
-        }
-      });
-    }
-
-    // 좌우 넘김 버튼 동작 함수
-    function scrollChasiList(distance) {
-      const list = document.getElementById('chasi-pill-list');
-      if (list) {
-        list.scrollBy({ left: distance, behavior: 'smooth' });
-      }
-    }
-
-    // 드롭다운 변경 시 실행
-    function onSelectChasiDropdown(val) {
-      selectChasi(val);
-    }
-
-    // 차시 선택 공통 처리 함수
-    function selectChasi(chasiId) {
-      currentChasi = chasiId;
-      const targetObj = CHASI_DATA.find(c => c.id === chasiId);
-      const label = targetObj ? targetObj.label : chasiId;
-
-      const statusText = document.getElementById('filter-status-text');
-      if (statusText) {
-        statusText.innerText = (chasiId === 'all') ? '전체 단원 보기' : `${label} 집중 학습`;
-      }
-
-      renderChasiTabs();
-
-      // 선택된 알약 버튼이 보이도록 자동 스크롤
-      const activeBtn = document.getElementById(`pill-chasi-${chasiId}`);
-      if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      }
-
-      if (currentMode === 'summary') renderSummaryView();
-      else if (currentMode === 'fillin') renderFillinView();
-      else if (currentMode === 'basic' || currentMode === 'advanced') reloadQuizSet();
-      else if (currentMode === 'essay') renderEssayView();
-    }
-
-    /* ========================================================
-       7. 개념 확인 (빈칸 타이핑) 렌더러
-       ======================================================== */
-    function renderFillinView() {
-      const container = document.getElementById('fillin-cards-list');
-      container.innerHTML = '';
-
-      const list = (currentChasi === 'all')
-        ? FILLIN_DATA_POOL
-        : FILLIN_DATA_POOL.filter(f => f.chasiId === currentChasi);
-
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl p-6 text-center text-slate-400 text-xs font-bold border border-slate-200">
-            해당 차시의 개념 확인 문항이 없습니다.
-          </div>
-        `;
+      if (!data) {
+        content.innerHTML = `<div class="card"><p>해당 차시의 데이터가 준비 중입니다.</p></div>`;
         return;
       }
 
-      list.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm space-y-3";
-
-        const formattedSentence = item.sentence.replace(
-          "(빈칸)",
-          `<span class="inline-block px-3 py-1 mx-1 font-black text-blue-700 bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg">[ 빈 칸 ]</span>`
-        );
-
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-black px-2.5 py-0.5 bg-blue-600 text-white rounded-md">#${index + 1}</span>
-              <span class="text-xs font-extrabold text-slate-500">${item.chasiLabel}</span>
-            </div>
-            <span class="text-xs text-slate-500 font-bold">초성: <strong class="text-blue-700 font-mono text-sm">${item.hint}</strong></span>
-          </div>
-
-          <p class="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
-            ${formattedSentence}
-          </p>
-
-          <div class="flex gap-2 pt-1 items-center">
-            <input 
-              type="text" 
-              id="fillin-input-${item.id}" 
-              placeholder="단어를 입력하세요" 
-              class="flex-1 text-sm font-semibold px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-300 focus:outline-none transition"
-              onkeypress="if(event.key === 'Enter') checkFillinAnswer('${item.id}')"
-            />
-            <button 
-              onclick="checkFillinAnswer('${item.id}')" 
-              class="touch-target px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition whitespace-nowrap"
-            >
-              확인
-            </button>
-          </div>
-
-          <div id="fillin-feedback-${item.id}" class="hidden p-3.5 rounded-xl text-xs sm:text-sm leading-relaxed border transition"></div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function checkFillinAnswer(id) {
-      const item = FILLIN_DATA_POOL.find(f => f.id === id);
-      if (!item) return;
-
-      const input = document.getElementById(`fillin-input-${id}`);
-      const feedback = document.getElementById(`fillin-feedback-${id}`);
-      const rawUserVal = input.value.trim();
-
-      if (!rawUserVal) {
-        feedback.classList.remove('hidden');
-        feedback.className = "p-3 rounded-xl text-xs sm:text-sm leading-relaxed border border-amber-300 bg-amber-50 text-amber-950 font-bold";
-        feedback.innerHTML = `⚠️ 단어를 먼저 입력해 주세요. (초성 힌트: <strong>${item.hint}</strong>)`;
-        return;
-      }
-
-      const cleanUserVal = rawUserVal.replace(/\s+/g, '').toLowerCase();
-      const cleanAnswer = item.answer.replace(/\s+/g, '').toLowerCase();
-
-      feedback.classList.remove('hidden');
-
-      if (cleanUserVal === cleanAnswer) {
-        input.className = "flex-1 text-sm font-black px-3.5 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 focus:outline-none";
-        feedback.className = "p-3.5 rounded-xl text-xs sm:text-sm leading-relaxed border-2 border-emerald-300 bg-emerald-50 text-emerald-950";
-        feedback.innerHTML = `
-          <div class="flex items-center gap-2 font-black text-sm text-emerald-800 mb-1">
-            <span>🎉 정답입니다!</span>
-            <span class="text-xs text-emerald-950 font-black bg-white px-2 py-0.5 rounded border border-emerald-300">${item.answer}</span>
-          </div>
-          <p class="text-slate-600 text-xs">${item.explanation}</p>
-        `;
-      } else {
-        feedback.className = "p-3.5 rounded-xl text-xs sm:text-sm leading-relaxed border-2 border-rose-300 bg-rose-50 text-rose-950";
-        feedback.innerHTML = `
-          <div class="font-black text-sm text-rose-700 mb-1">❌ 오답입니다! 다시 확인해 보세요.</div>
-          <p class="text-slate-700 text-xs">입력한 내용: <span class="line-through font-bold">${rawUserVal}</span></p>
-          <div class="mt-1.5 pt-1.5 border-t border-rose-200 flex items-center justify-between text-xs">
-            <span>💡 학습지 정답: <strong class="text-blue-700 font-black text-sm">${item.answer}</strong></span>
-            <span class="text-slate-500 font-semibold">${item.explanation}</span>
-          </div>
-        `;
-      }
-    }
-
-    function resetAllFillins() {
-      const list = (currentChasi === 'all')
-        ? FILLIN_DATA_POOL
-        : FILLIN_DATA_POOL.filter(f => f.chasiId === currentChasi);
-
-      list.forEach(item => {
-        const input = document.getElementById(`fillin-input-${item.id}`);
-        const feedback = document.getElementById(`fillin-feedback-${item.id}`);
-        if (input) {
-          input.value = '';
-          input.className = "flex-1 text-sm font-semibold px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-300 focus:outline-none transition";
-        }
-        if (feedback) {
-          feedback.classList.add('hidden');
-          feedback.innerHTML = '';
-        }
-      });
-    }
-
-    /* ========================================================
-       8. 화면별 렌더러
-       ======================================================== */
-    function renderSummaryView() {
-      const container = document.getElementById('view-summary');
-      container.innerHTML = '';
-
-      const list = (currentChasi === 'all') 
-        ? SUMMARY_DATA 
-        : SUMMARY_DATA.filter(s => s.id === currentChasi);
-
-      list.forEach(sec => {
-        const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm";
-
-        let sectionsMarkup = sec.sections.map(s => `
-          <div class="mb-5 last:mb-0">
-            <h4 class="text-xs sm:text-sm font-black text-blue-900 bg-blue-50 inline-block px-3 py-1.5 rounded-lg mb-2.5 border border-blue-100">
-              ${s.title}
-            </h4>
-            <div class="space-y-2.5">
-              ${s.items.map(it => `
-                <div class="text-xs sm:text-sm text-slate-800 leading-relaxed pl-3 border-l-2 border-blue-400">
-                  ${it}
+      if (currentTab === 'summary') {
+        let timelineHTML = '';
+        if (data.timeline && data.timeline.length > 0) {
+          timelineHTML = `
+            <div class="timeline-container">
+              <div class="timeline-header">
+                <span>📌 핵심 연표 와이드 인포그래픽</span>
+                <div class="timeline-nav-btns">
+                  <button onclick="scrollTimeline(-250)">◀</button>
+                  <button onclick="scrollTimeline(250)">▶</button>
                 </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('');
-
-        // 인포그래픽 타임라인 생성 (원본 지그재그 인포그래픽 디자인 복원 + 가로 확장 직사각형 비율)
-        let timelineMarkup = '';
-        if (sec.timeline && sec.timeline.length > 0) {
-          const colorStyles = {
-            blue: { bar: '#2563eb', bg: 'bg-blue-600', text: 'text-blue-600', ring: 'ring-blue-500', line: 'bg-blue-500' },
-            teal: { bar: '#0d9488', bg: 'bg-teal-600', text: 'text-teal-600', ring: 'ring-teal-500', line: 'bg-teal-500' },
-            amber: { bar: '#d97706', bg: 'bg-amber-500', text: 'text-amber-600', ring: 'ring-amber-500', line: 'bg-amber-500' },
-            rose: { bar: '#e11d48', bg: 'bg-rose-500', text: 'text-rose-600', ring: 'ring-rose-500', line: 'bg-rose-500' },
-            indigo: { bar: '#4f46e5', bg: 'bg-indigo-600', text: 'text-indigo-600', ring: 'ring-indigo-500', line: 'bg-indigo-500' }
-          };
-
-          const totalNodes = sec.timeline.length;
-          const nodeWidth = 260; // 가로 길이를 더 여유 있게 늘려 옆으로 긴 직사각형 형태로 변경
-
-          const nodesHtml = sec.timeline.map((item, idx) => {
-            const isTop = (idx % 2 === 0); // 홀/짝 위아래 지그재그 배치
-            const style = colorStyles[item.color] || colorStyles.blue;
-
-            // 위쪽에 배치되는 요소 (세로 높이 압축: 60px)
-            const topBlock = isTop ? `
-              <div class="flex flex-col items-center justify-end pb-1.5 h-[62px] text-center px-1">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-5 h-5 rounded-md ${style.bg} text-white flex items-center justify-center text-[11px] shadow-2xs flex-shrink-0">
-                    ${item.icon || '📌'}
-                  </div>
-                  <span class="text-xs font-black tracking-tight ${style.text}">${item.time}</span>
-                  <h5 class="text-xs font-black text-slate-900 leading-none truncate max-w-[130px]">${item.title}</h5>
-                </div>
-                <p class="text-[11px] text-slate-500 leading-tight mt-1 line-clamp-1 max-w-[240px]">${item.desc}</p>
               </div>
-              <!-- 세로 연결선 (위) -->
-              <div class="w-0.5 h-3 ${style.line} mx-auto"></div>
-            ` : `
-              <!-- 빈 공간 유지 (세로 높이 컴팩트 고정) -->
-              <div class="h-[74px]"></div>
-            `;
-
-            // 아래쪽에 배치되는 요소 (세로 높이 압축: 60px)
-            const bottomBlock = !isTop ? `
-              <!-- 세로 연결선 (아래) -->
-              <div class="w-0.5 h-3 ${style.line} mx-auto"></div>
-              <div class="flex flex-col items-center justify-start pt-1.5 h-[62px] text-center px-1">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-5 h-5 rounded-md ${style.bg} text-white flex items-center justify-center text-[11px] shadow-2xs flex-shrink-0">
-                    ${item.icon || '📌'}
+              <div class="timeline-rail" id="timelineRail">
+                <div class="timeline-bar-bg"></div>
+                ${data.timeline.map(item => `
+                  <div class="timeline-node">
+                    <span class="year">${item.year}</span>
+                    <div class="title">${item.title}</div>
+                    <div class="desc">${item.desc}</div>
                   </div>
-                  <span class="text-xs font-black tracking-tight ${style.text}">${item.time}</span>
-                  <h5 class="text-xs font-black text-slate-900 leading-none truncate max-w-[130px]">${item.title}</h5>
-                </div>
-                <p class="text-[11px] text-slate-500 leading-tight mt-1 line-clamp-1 max-w-[240px]">${item.desc}</p>
-              </div>
-            ` : `
-              <!-- 빈 공간 유지 (세로 높이 컴팩트 고정) -->
-              <div class="h-[74px]"></div>
-            `;
-
-            return `
-              <div class="relative flex-shrink-0 flex flex-col justify-center" style="width: ${nodeWidth}px;">
-                ${topBlock}
-
-                <!-- 중앙 연결 바 & 중심 원형 포인트 노드 -->
-                <div class="relative w-full h-3 flex items-center">
-                  <div class="absolute inset-x-0 h-1 rounded-full" style="background-color: ${style.bar};"></div>
-                  <div class="relative z-10 w-3 h-3 mx-auto rounded-full bg-white ring-2 ${style.ring} shadow-xs"></div>
-                </div>
-
-                ${bottomBlock}
-              </div>
-            `;
-          }).join('');
-
-          const timelineUid = `tl-${sec.id}`;
-
-          timelineMarkup = `
-            <div class="mt-5 pt-4 border-t border-slate-100">
-              <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center gap-1.5">
-                    <span class="text-xs">⏱️</span>
-                    <span class="text-xs font-black text-slate-800">한눈에 되돌아보는 사건 흐름</span>
-                  </div>
-                  <!-- 좌우 넘김 버튼 -->
-                  <div class="flex items-center gap-1">
-                    <button onclick="scrollTimeline('${timelineUid}', -260)" class="w-7 h-7 bg-white hover:bg-slate-100 active:bg-slate-200 border border-slate-300 rounded-lg text-slate-700 font-black text-xs flex items-center justify-center shadow-2xs transition" aria-label="이전 사건">
-                      ◀
-                    </button>
-                    <button onclick="scrollTimeline('${timelineUid}', 260)" class="w-7 h-7 bg-white hover:bg-slate-100 active:bg-slate-200 border border-slate-300 rounded-lg text-slate-700 font-black text-xs flex items-center justify-center shadow-2xs transition" aria-label="다음 사건">
-                      ▶
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- 인포그래픽 지그재그 타임라인 뷰포트 (옆으로 긴 슬림 직사각형 레일) -->
-                <div id="${timelineUid}" class="infographic-scroll overflow-x-auto py-1 scroll-smooth">
-                  <div class="flex items-center" style="width: ${totalNodes * nodeWidth}px; min-width: 100%;">
-                    ${nodesHtml}
-                  </div>
-                </div>
+                `).join('')}
               </div>
             </div>
           `;
         }
 
-        card.innerHTML = `
-          <div class="pb-3 mb-4 border-b border-slate-100">
-            <span class="text-xs font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">${sec.badge}</span>
-            <h3 class="text-base sm:text-lg font-black text-slate-900 mt-2">${sec.title}</h3>
-          </div>
-          <div class="space-y-4">
-            ${sectionsMarkup}
-          </div>
-          ${timelineMarkup}
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // 타임라인 가로 넘김 스크롤 함수
-    function scrollTimeline(elementId, distance) {
-      const el = document.getElementById(elementId);
-      if (el) {
-        el.scrollBy({ left: distance, behavior: 'smooth' });
-      }
-    }
-
-    function reloadQuizSet() {
-      document.getElementById('quiz-result-card').classList.add('hidden');
-      document.getElementById('quiz-card').classList.remove('hidden');
-
-      const sourcePool = (currentMode === 'basic') ? BASIC_QUIZ_POOL : ADVANCED_QUIZ_POOL;
-
-      let filtered = (currentChasi === 'all')
-        ? [...sourcePool]
-        : sourcePool.filter(q => q.chasiId === currentChasi);
-
-      if (filtered.length === 0) {
-        filtered = [...sourcePool];
-      }
-
-      const shuffledQuestions = shuffleArray(filtered);
-      const questionCount = (currentChasi === 'all') ? Math.min(6, shuffledQuestions.length) : shuffledQuestions.length;
-      const sliced = shuffledQuestions.slice(0, questionCount);
-
-      currentQuizList = sliced.map(q => {
-        const correctText = q.options[q.correctIndex];
-        const shuffledOpts = shuffleArray(q.options);
-        const newCorrectIdx = shuffledOpts.indexOf(correctText);
-        return {
-          chasiLabel: q.chasiLabel,
-          material: q.material || null,
-          question: q.question,
-          options: shuffledOpts,
-          correctIndex: newCorrectIdx,
-          explanation: q.explanation
-        };
-      });
-
-      quizPointer = 0;
-      userAnswers = new Array(currentQuizList.length).fill(null);
-      submittedState = new Array(currentQuizList.length).fill(false);
-
-      document.getElementById('quiz-count-info').innerText = `총 ${currentQuizList.length}문항`;
-      renderCurrentQuizCard();
-    }
-
-    function renderCurrentQuizCard() {
-      if (currentQuizList.length === 0) return;
-
-      const q = currentQuizList[quizPointer];
-      const total = currentQuizList.length;
-
-      document.getElementById('q-number').innerText = `Q${quizPointer + 1}`;
-      document.getElementById('q-chasi').innerText = q.chasiLabel;
-      document.getElementById('q-step').innerText = `${quizPointer + 1} / ${total}`;
-      document.getElementById('q-bar').style.width = `${((quizPointer + 1) / total) * 100}%`;
-      document.getElementById('q-text').innerText = q.question;
-
-      const matBox = document.getElementById('q-box-material');
-      if (q.material) {
-        matBox.classList.remove('hidden');
-        matBox.innerText = q.material;
-      } else {
-        matBox.classList.add('hidden');
-      }
-
-      const optContainer = document.getElementById('q-options-container');
-      optContainer.innerHTML = '';
-      const numPrefix = ['①', '②', '③', '④', '⑤'];
-      const isAnswered = submittedState[quizPointer];
-      const picked = userAnswers[quizPointer];
-
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.disabled = isAnswered;
-
-        let cls = "w-full text-left p-3.5 sm:p-4 rounded-xl border text-xs sm:text-sm font-bold transition touch-target flex items-start justify-between ";
-
-        if (!isAnswered) {
-          cls += "border-slate-200 bg-white text-slate-800 hover:border-blue-400 hover:bg-blue-50/40";
-        } else {
-          if (idx === q.correctIndex) {
-            cls += "border-2 border-emerald-500 bg-emerald-50 text-emerald-950 font-black";
-          } else if (idx === picked) {
-            cls += "border-2 border-rose-300 bg-rose-50 text-rose-800 line-through opacity-90";
-          } else {
-            cls += "border-slate-200 bg-slate-50 text-slate-400 opacity-60";
-          }
-        }
-
-        btn.className = cls;
-        btn.onclick = () => onSelectQuizOption(idx);
-        btn.innerHTML = `
-          <div class="flex items-start gap-2.5">
-            <span class="text-blue-700 font-black flex-shrink-0 text-sm sm:text-base">${numPrefix[idx]}</span>
-            <span class="leading-relaxed">${opt}</span>
-          </div>
-          ${isAnswered && idx === q.correctIndex ? '<span class="text-xs font-black text-emerald-800 bg-emerald-200 px-2 py-0.5 rounded-md flex-shrink-0 ml-1">정답</span>' : ''}
-        `;
-        optContainer.appendChild(btn);
-      });
-
-      const feedBox = document.getElementById('q-feedback');
-      if (isAnswered) {
-        feedBox.classList.remove('hidden');
-        const isCorrect = (picked === q.correctIndex);
-        if (isCorrect) {
-          feedBox.className = "mt-4 p-4 rounded-xl text-xs sm:text-sm leading-relaxed border-2 border-emerald-300 bg-emerald-50 text-emerald-950 font-bold";
-          feedBox.innerHTML = `🎉 정답입니다!<p class="mt-1 text-slate-700 font-normal">${q.explanation}</p>`;
-        } else {
-          feedBox.className = "mt-4 p-4 rounded-xl text-xs sm:text-sm leading-relaxed border-2 border-rose-300 bg-rose-50 text-rose-950 font-bold";
-          feedBox.innerHTML = `❌ 오답입니다. (정답: ${numPrefix[q.correctIndex]})<p class="mt-1 text-slate-700 font-normal">${q.explanation}</p>`;
-        }
-      } else {
-        feedBox.classList.add('hidden');
-      }
-
-      document.getElementById('q-prev-btn').disabled = (quizPointer === 0);
-      const nextBtn = document.getElementById('q-next-btn');
-      if (quizPointer === total - 1) {
-        nextBtn.innerText = "채점 완료 확인";
-        nextBtn.className = "touch-target px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition";
-      } else {
-        nextBtn.innerText = "다음 문항 →";
-        nextBtn.className = "touch-target px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition";
-      }
-    }
-
-    function onSelectQuizOption(idx) {
-      if (submittedState[quizPointer]) return;
-      userAnswers[quizPointer] = idx;
-      submittedState[quizPointer] = true;
-      renderCurrentQuizCard();
-    }
-
-    function moveQuiz(step) {
-      const target = quizPointer + step;
-      if (target >= 0 && target < currentQuizList.length) {
-        quizPointer = target;
-        renderCurrentQuizCard();
-      } else if (target >= currentQuizList.length) {
-        document.getElementById('quiz-card').classList.add('hidden');
-        document.getElementById('quiz-result-card').classList.remove('hidden');
-
-        let correct = 0;
-        currentQuizList.forEach((q, idx) => {
-          if (userAnswers[idx] === q.correctIndex) correct++;
-        });
-
-        document.getElementById('final-correct').innerText = correct;
-        document.getElementById('final-total').innerText = currentQuizList.length;
-      }
-    }
-
-    function renderEssayView() {
-      const container = document.getElementById('essay-cards-list');
-      container.innerHTML = '';
-
-      const list = (currentChasi === 'all')
-        ? ESSAY_DATA_POOL
-        : ESSAY_DATA_POOL.filter(e => e.chasiId === currentChasi);
-
-      if (list.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl p-6 text-center text-slate-400 text-xs font-bold border border-slate-200">
-            해당 차시의 서술형 문항이 없습니다.
+        content.innerHTML = `
+          <div class="card">
+            <h2>${data.unit}</h2>
+            <div class="summary-text">${data.summary}</div>
+            ${timelineHTML}
           </div>
         `;
-        return;
-      }
-
-      list.forEach((item, idx) => {
-        const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-3.5";
-
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black px-2.5 py-1 bg-amber-100 text-amber-950 rounded-lg">서술형 0${idx + 1}</span>
-            <span class="text-xs font-bold text-slate-500">${item.chasiLabel}</span>
-          </div>
-
-          <h3 class="text-sm sm:text-base font-black text-slate-900 leading-snug">
-            ${item.question}
-          </h3>
-
-          <textarea id="essay-input-${item.id}" rows="3" placeholder="학습지에 수록된 문장 표현으로 답변을 작성해 보세요..." class="w-full text-xs sm:text-sm font-semibold p-3.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-300 focus:outline-none leading-relaxed"></textarea>
-
-          <div class="flex items-center justify-between pt-1">
-            <span class="text-xs text-slate-500 font-bold">필수 키워드: ${item.exactKeywords.join(', ')}</span>
-            <button onclick="checkEssayResult('${item.id}')" class="touch-target px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition">
-              채점 및 모범 답안
-            </button>
-          </div>
-
-          <div id="essay-box-${item.id}" class="hidden pt-3 border-t border-slate-100 space-y-2.5">
-            <div id="essay-badge-${item.id}" class="text-xs sm:text-sm font-black"></div>
-            <div class="p-3.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed">
-              <span class="font-black text-blue-900 block mb-1">💡 학습지 모범 답안:</span>
-              ${item.modelAnswer}
-            </div>
-            <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-slate-800">
-              <span class="font-black text-amber-950 block mb-1">📋 채점 기준:</span>
-              <ul class="list-disc pl-4 space-y-1">
-                ${item.rubric.map(r => `<li>${r}</li>`).join('')}
-              </ul>
-            </div>
+      } else if (currentTab === 'quiz') {
+        content.innerHTML = `
+          <div class="card">
+            <h2>📝 객관식 문제 6선 (기본 3제 + 심화 3제)</h2>
+            ${data.quizzes.map((quiz, qIdx) => `
+              <div class="quiz-card" id="qcard-${qIdx}">
+                <div class="quiz-meta">
+                  <span class="badge ${quiz.type === '기본' ? 'badge-primary' : 'badge-accent'}">${quiz.type} 문항 ${qIdx + 1}</span>
+                </div>
+                <div class="quiz-q">${quiz.q}</div>
+                <div class="quiz-options">
+                  ${quiz.options.map((opt, oIdx) => `
+                    <button class="opt-btn" onclick="checkAnswer(${unitIdx}, ${qIdx}, ${oIdx}, this)">
+                      ${oIdx + 1}. ${opt}
+                    </button>
+                  `).join('')}
+                </div>
+                <div class="explanation" id="exp-${qIdx}">
+                  <b>해설:</b> ${quiz.exp}
+                </div>
+              </div>
+            `).join('')}
           </div>
         `;
-        container.appendChild(card);
-      });
-    }
-
-    function checkEssayResult(id) {
-      const q = ESSAY_DATA_POOL.find(e => e.id === id);
-      if (!q) return;
-
-      const inputVal = document.getElementById(`essay-input-${id}`).value.trim();
-      const box = document.getElementById(`essay-box-${id}`);
-      const badge = document.getElementById(`essay-badge-${id}`);
-
-      box.classList.remove('hidden');
-
-      let hitCount = 0;
-      let hitList = [];
-      q.exactKeywords.forEach(kw => {
-        if (inputVal.includes(kw)) {
-          hitCount++;
-          hitList.push(kw);
-        }
-      });
-
-      if (inputVal.length < 5) {
-        badge.className = "text-xs sm:text-sm font-black text-rose-600";
-        badge.innerText = "⚠️ 답안을 작성한 뒤 채점 버튼을 눌러주세요.";
-      } else if (hitCount >= Math.ceil(q.exactKeywords.length * 0.6)) {
-        badge.className = "text-xs sm:text-sm font-black text-emerald-700";
-        badge.innerText = `✅ 핵심 키워드 [${hitList.join(', ')}] 포함 완료! 모범 답안과 비교해 보세요.`;
-      } else {
-        badge.className = "text-xs sm:text-sm font-black text-amber-700";
-        badge.innerText = `🔍 보완 필요 (포함된 키워드: ${hitList.length ? hitList.join(', ') : '없음'}). 모범 답안을 확인하세요.`;
+      } else if (currentTab === 'blank') {
+        content.innerHTML = `
+          <div class="card">
+            <h2>✏️ 핵심 개념 빈칸 완성하기</h2>
+            ${data.blanks.map((b, bIdx) => `
+              <div class="blank-row">
+                <span><b>${bIdx + 1}.</b> ${b.q}</span>
+                <br/>
+                <input type="text" class="blank-input" id="blank-in-${bIdx}" placeholder="정답 입력" />
+                <button class="btn-check-blank" onclick="checkBlank(${unitIdx}, ${bIdx})">정답 확인</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (currentTab === 'essay') {
+        content.innerHTML = `
+          <div class="card">
+            <h2>✍️ 서술형 키워드 트레이닝</h2>
+            ${data.essays.map((e, eIdx) => `
+              <div class="desc-box">
+                <div class="desc-prompt"><b>문제 ${eIdx + 1}.</b> ${e.q}</div>
+                <textarea class="desc-area" id="essay-text-${eIdx}" placeholder="여기에 서술형 답안을 작성해보세요..."></textarea>
+                <br/>
+                <button class="desc-check-btn" onclick="checkEssay(${unitIdx}, ${eIdx})">모범 답안 및 채점 기준 확인</button>
+                <div class="desc-feedback" id="essay-fb-${eIdx}">
+                  <p style="color:var(--primary-dark); font-weight:700; margin-bottom:4px;">[채점 핵심 키워드]</p>
+                  <p>${e.keywords.map(kw => `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-right:4px;">#${kw}</span>`).join(' ')}</p>
+                  <p style="color:var(--text); font-weight:700; margin-top:8px; margin-bottom:4px;">[학습지 모범 답안]</p>
+                  <p>${e.modelAns}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      renderChasiTabs();
-      renderSummaryView();
-    });
+    function checkAnswer(unitIdx, qIdx, selectedIdx, btnElem) {
+      const quiz = database[unitIdx].quizzes[qIdx];
+      const card = document.getElementById(`qcard-${qIdx}`);
+      const exp = document.getElementById(`exp-${qIdx}`);
+      const buttons = card.querySelectorAll('.opt-btn');
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (selectedIdx === quiz.ans) {
+        btnElem.classList.add('selected-correct');
+        card.classList.add('correct');
+      } else {
+        btnElem.classList.add('selected-wrong');
+        buttons[quiz.ans].classList.add('selected-correct');
+        card.classList.add('wrong');
+      }
+      exp.style.display = 'block';
+    }
+
+    function checkBlank(unitIdx, bIdx) {
+      const blankData = database[unitIdx].blanks[bIdx];
+      const input = document.getElementById(`blank-in-${bIdx}`);
+      const val = input.value.trim().replace(/\s+/g, '');
+      const correctVal = blankData.a.trim().replace(/\s+/g, '');
+
+      if (val === correctVal) {
+        input.classList.remove('is-wrong');
+        input.classList.add('is-correct');
+      } else {
+        input.classList.remove('is-correct');
+        input.classList.add('is-wrong');
+        input.value = blankData.a + " (오답)";
+      }
+    }
+
+    function checkEssay(unitIdx, eIdx) {
+      const fb = document.getElementById(`essay-fb-${eIdx}`);
+      fb.style.display = 'block';
+    }
+
+    function scrollTimeline(offset) {
+      const rail = document.getElementById('timelineRail');
+      if (rail) rail.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+
+    // 최초 렌더링
+    renderCurrentUnit();
   </script>
 </body>
 </html>
